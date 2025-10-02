@@ -37,7 +37,7 @@ export function Topbar() {
 
   return (
     <>
-      <header className="border-b bg-white shadow-sm">
+      <header className="no-print border-b bg-white shadow-sm">
         <div className="flex items-center justify-between px-6 py-4">
           {/* Left: Logo and Title */}
           <div className="flex items-center gap-3">

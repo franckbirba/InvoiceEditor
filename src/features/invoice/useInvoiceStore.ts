@@ -22,60 +22,73 @@ interface InvoiceStore {
 
 const defaultTemplate = `<div class="invoice-preview" id="invoice-content">
   <div class="invoice-header">
-    <h1 class="invoice-title">{{#locale}}FACTURE{{/locale}}</h1>
+    <div class="invoice-title">FACTURE</div>
+    <div class="header-separator"></div>
     <div class="invoice-meta">
       <div><strong>N°</strong> {{invoice.number}}</div>
-      <div><strong>Date:</strong> {{formatted.date}}</div>
+      <div style="font-size: 14px; color: #666;">{{sender.name}}</div>
+      <div><strong>DATE:</strong> {{formatted.date}}</div>
     </div>
+    <div class="header-separator"></div>
   </div>
 
-  <div class="invoice-parties">
-    <div class="party-card">
-      <h3>Émetteur</h3>
-      {{#sender.logo}}<img src="{{sender.logo}}" alt="Logo" style="max-width: 100px; margin-bottom: 8px;" />{{/sender.logo}}
-      <p><strong>{{sender.name}}</strong></p>
-      {{#sender.address}}<p style="white-space: pre-line;">{{sender.address}}</p>{{/sender.address}}
-      {{#sender.email}}<p>{{sender.email}}</p>{{/sender.email}}
-      {{#sender.phone}}<p>{{sender.phone}}</p>{{/sender.phone}}
-      {{#sender.bank}}<p style="white-space: pre-line;">{{sender.bank}}</p>{{/sender.bank}}
-      {{#sender.notes}}<p><em>{{sender.notes}}</em></p>{{/sender.notes}}
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0;">
+    <div>
+      <div class="section-title">Émetteur</div>
+      <div class="info-box" style="margin-bottom: 0;">
+        <strong>{{sender.name}}</strong><br>
+        {{#sender.address}}{{sender.address}}<br>{{/sender.address}}
+        {{#sender.email}}📧 {{sender.email}}<br>{{/sender.email}}
+        {{#sender.phone}}📱 {{sender.phone}}<br>{{/sender.phone}}
+        {{#sender.bank}}{{sender.bank}}<br>{{/sender.bank}}
+        {{#sender.notes}}<em>{{sender.notes}}</em>{{/sender.notes}}
+      </div>
     </div>
-    <div class="party-card">
-      <h3>Client</h3>
-      <p><strong>{{client.name}}</strong></p>
-      {{#client.address}}<p style="white-space: pre-line;">{{client.address}}</p>{{/client.address}}
-      {{#client.reg}}<p>{{client.reg}}</p>{{/client.reg}}
+    <div>
+      <div class="section-title">Client</div>
+      <div class="info-box" style="margin-bottom: 0;">
+        <strong>{{client.name}}</strong><br>
+        {{#client.address}}{{client.address}}<br>{{/client.address}}
+        {{#client.email}}📧 {{client.email}}<br>{{/client.email}}
+        {{#client.phone}}📱 {{client.phone}}<br>{{/client.phone}}
+        {{#client.bank}}{{client.bank}}<br>{{/client.bank}}
+        {{#client.reg}}{{client.reg}}<br>{{/client.reg}}
+        {{#client.notes}}<em>{{client.notes}}</em>{{/client.notes}}
+      </div>
     </div>
   </div>
 
   {{#invoice.subject}}
-  <div style="margin-bottom: 24px; padding: 12px; background: #f8fafc; border-radius: 8px;">
-    <strong>Objet:</strong> {{invoice.subject}}
-  </div>
+  <div class="section-title" style="margin-top: 8px;">Objet</div>
+  <div class="highlight-box">{{invoice.subject}}</div>
   {{/invoice.subject}}
 
-  <table class="invoice-table">
-    <thead>
-      <tr>
-        <th>Désignation</th>
-        <th style="text-align: center;">Qté</th>
-        <th style="text-align: right;">P.U.</th>
-        <th style="text-align: right;">Total</th>
-      </tr>
-    </thead>
-    <tbody>
-      {{#items_with_totals}}
-      <tr>
-        <td>{{description}}</td>
-        <td style="text-align: center;">{{qty_formatted}}</td>
-        <td class="text-right">{{unit_price_formatted}}</td>
-        <td class="text-right"><strong>{{line_total_formatted}}</strong></td>
-      </tr>
-      {{/items_with_totals}}
-    </tbody>
-  </table>
+  <div class="section-title">Prestations</div>
+  <div class="table-wrapper">
+    <table class="invoice-table">
+      <thead>
+        <tr>
+          <th>DÉSIGNATION</th>
+          <th style="text-align: center;">QTÉ</th>
+          <th style="text-align: right;">P.U.</th>
+          <th style="text-align: right;">TOTAL</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#items_with_totals}}
+        <tr>
+          <td>{{description}}</td>
+          <td style="text-align: center;">{{qty_formatted}}</td>
+          <td class="text-right">{{unit_price_formatted}}</td>
+          <td class="text-right"><strong>{{line_total_formatted}}</strong></td>
+        </tr>
+        {{/items_with_totals}}
+      </tbody>
+    </table>
+  </div>
 
-  <div class="invoice-summary">
+  <div class="section-title">Récapitulatif</div>
+  <div class="summary-section">
     <div class="summary-row">
       <span>Sous-total:</span>
       <span>{{formatted.subtotal}}</span>
@@ -87,20 +100,18 @@ const defaultTemplate = `<div class="invoice-preview" id="invoice-content">
     </div>
     {{/totals.taxes}}
     <div class="summary-row total">
-      <span><strong>TOTAL</strong></span>
-      <span><strong>{{formatted.total}}</strong></span>
+      <span>TOTAL</span>
+      <span>{{formatted.total}}</span>
     </div>
   </div>
 
   {{#invoice.payment_terms}}
-  <div style="margin-bottom: 24px; padding: 12px; background: #eff6ff; border-left: 4px solid #2563eb;">
-    <strong>Conditions de paiement:</strong> {{invoice.payment_terms}}
-  </div>
+  <div class="section-title">Conditions de paiement</div>
+  <div class="highlight-box">{{invoice.payment_terms}}</div>
   {{/invoice.payment_terms}}
 
-  <div class="invoice-footer">
-    {{#footer.legal}}<p>{{footer.legal}}</p>{{/footer.legal}}
-    {{#footer.signature}}<div style="margin-top: 24px;"><img src="{{footer.signature}}" alt="Signature" style="max-width: 200px;" /></div>{{/footer.signature}}
+  <div class="footer-section">
+    {{#footer.legal}}{{footer.legal}}{{/footer.legal}}
   </div>
 </div>`;
 

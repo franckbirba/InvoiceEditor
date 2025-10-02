@@ -1,7 +1,7 @@
 @media print {
   @page {
     size: A4 portrait;
-    margin: 12mm 15mm;
+    margin: 0;
   }
 
   body {
@@ -10,39 +10,67 @@
     background: white;
   }
 
+  /* Force print backgrounds */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
   /* Remove container constraints */
   .w-full,
   .overflow-auto,
-  .bg-gray-100,
   .flex {
     width: 100% !important;
     overflow: visible !important;
-    background: white !important;
     padding: 0 !important;
     margin: 0 !important;
     display: block !important;
+  }
+
+  /* Keep theme background */
+  .bg-gray-100 {
+    background: transparent !important;
   }
 
   /* Hide UI elements */
   .no-print,
   button,
   nav,
+  header,
+  aside,
   .topbar,
   .sidebar,
   .editor,
-  .controls {
+  .controls,
+  [class*="absolute"],
+  [class*="fixed"] {
     display: none !important;
   }
 
-  /* Invoice preview takes full width */
+  /* Show only invoice content */
+  #invoice-content,
   .invoice-preview {
-    max-width: 100%;
-    margin: 0;
-    padding: 0;
-    box-shadow: none;
-    border: none;
-    transform: none !important;
+    display: block !important;
+  }
+
+  /* Main container takes full page */
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+  }
+
+  /* Invoice preview takes full width with consistent padding */
+  .invoice-preview {
+    max-width: 100% !important;
     width: 100% !important;
+    margin: 0 !important;
+    padding: 15mm !important;
+    box-shadow: none !important;
+    border: none !important;
+    transform: none !important;
+    min-height: 100vh !important;
   }
 
   /* Reset transform and width for print */
@@ -85,23 +113,28 @@
     page-break-inside: avoid;
   }
 
-  /* Adjust colors for print */
-  * {
-    color: #000 !important;
-    background: transparent !important;
+  /* Keep CV theme colors for print */
+  .invoice-preview {
+    background: white !important;
   }
 
-  .invoice-table tbody tr:nth-child(even) {
-    background-color: #f8f8f8 !important;
-  }
-
-  .invoice-header {
-    border-bottom-color: #2563eb !important;
+  .header-separator,
+  .invoice-table thead th {
+    border-color: #6aaf50 !important;
   }
 
   .summary-row.total {
-    border-top-color: #2563eb !important;
-    border-bottom-color: #2563eb !important;
+    border-color: #6aaf50 !important;
+  }
+
+  .info-box strong,
+  .invoice-meta strong {
+    color: #d32f2f !important;
+  }
+
+  /* Print grid properly */
+  [style*="display: grid"] {
+    display: grid !important;
   }
 
   /* Ensure images print */
