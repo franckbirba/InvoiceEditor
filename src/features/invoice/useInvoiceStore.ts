@@ -1,7 +1,12 @@
 import { create } from 'zustand';
 import type { InvoiceData } from './invoice.schema';
 import { InvoiceDataSchema } from './invoice.schema';
-import { saveToLocalStorage, loadFromLocalStorage, STORAGE_KEYS } from '../../lib/storage';
+import {
+  getActiveDocumentId,
+  loadDocument,
+  saveDocument,
+  createNewDocument,
+} from '../../lib/storage';
 import sampleData from './sample-data.json';
 
 interface InvoiceStore {
@@ -9,6 +14,7 @@ interface InvoiceStore {
   template: string;
   isEditorMode: boolean;
   dataVersion: number; // Incremented on external updates to trigger form reset
+  activeDocumentId: string | null;
 
   setData: (data: InvoiceData) => void;
   updateData: (updater: (data: InvoiceData) => InvoiceData) => void;
@@ -18,6 +24,8 @@ interface InvoiceStore {
   duplicateInvoice: () => void;
   loadFromJson: (json: string) => void;
   exportToJson: () => string;
+  loadDocumentById: (id: string) => void;
+  createDocument: () => void;
 }
 
 const defaultTemplate = `<div class="invoice-preview" id="invoice-content">
@@ -116,35 +124,66 @@ const defaultTemplate = `<div class="invoice-preview" id="invoice-content">
 </div>`;
 
 export const useInvoiceStore = create<InvoiceStore>((set, get) => {
-  // Load initial data from localStorage or use sample
-  const savedData = loadFromLocalStorage<InvoiceData>(STORAGE_KEYS.DATA);
-  const savedTemplate = loadFromLocalStorage<string>(STORAGE_KEYS.TEMPLATE);
+  // Load initial data - try active document first
+  let activeId = getActiveDocumentId();
+  let initialData: InvoiceData;
+  let initialTemplate: string = defaultTemplate;
 
-  const initialData = savedData
-    ? InvoiceDataSchema.parse(savedData)
-    : InvoiceDataSchema.parse(sampleData);
+  if (activeId) {
+    const doc = loadDocument(activeId);
+    if (doc) {
+      initialData = InvoiceDataSchema.parse(doc.data);
+      initialTemplate = doc.template || defaultTemplate;
+    } else {
+      // Document not found, create new one
+      activeId = createNewDocument();
+      initialData = InvoiceDataSchema.parse(sampleData);
+    }
+  } else {
+    // No active document, create new one
+    activeId = createNewDocument();
+    initialData = InvoiceDataSchema.parse(sampleData);
+  }
+
+  const saveCurrentDocument = () => {
+    const state = get();
+    if (state.activeDocumentId) {
+      saveDocument(
+        state.activeDocumentId,
+        state.data,
+        state.template,
+        {
+          name: `Facture ${state.data.invoice.number}`,
+          createdAt: Date.now(),
+          invoiceNumber: state.data.invoice.number,
+          clientName: state.data.client.name,
+        }
+      );
+    }
+  };
 
   return {
     data: initialData,
-    template: savedTemplate || defaultTemplate,
+    template: initialTemplate,
     isEditorMode: false,
     dataVersion: 0,
+    activeDocumentId: activeId,
 
     setData: (data) => {
-      set({ data }); // Don't increment dataVersion for autosave
-      saveToLocalStorage(STORAGE_KEYS.DATA, data);
+      set({ data });
+      saveCurrentDocument();
     },
 
     updateData: (updater) => {
       const currentData = get().data;
       const newData = updater(currentData);
       set({ data: newData });
-      saveToLocalStorage(STORAGE_KEYS.DATA, newData);
+      saveCurrentDocument();
     },
 
     setTemplate: (template) => {
       set({ template });
-      saveToLocalStorage(STORAGE_KEYS.TEMPLATE, template);
+      saveCurrentDocument();
     },
 
     toggleEditorMode: () => {
@@ -154,12 +193,12 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => {
     resetToSample: () => {
       const data = InvoiceDataSchema.parse(sampleData);
       set({ data, template: defaultTemplate, dataVersion: get().dataVersion + 1 });
-      saveToLocalStorage(STORAGE_KEYS.DATA, data);
-      saveToLocalStorage(STORAGE_KEYS.TEMPLATE, defaultTemplate);
+      saveCurrentDocument();
     },
 
     duplicateInvoice: () => {
       const currentData = get().data;
+      const currentTemplate = get().template;
       const duplicatedData = {
         ...currentData,
         invoice: {
@@ -168,8 +207,27 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => {
           date: new Date().toISOString().split('T')[0],
         },
       };
-      set({ data: duplicatedData, dataVersion: get().dataVersion + 1 });
-      saveToLocalStorage(STORAGE_KEYS.DATA, duplicatedData);
+
+      // Create a new document with duplicated data
+      const newId = createNewDocument();
+      saveDocument(
+        newId,
+        duplicatedData,
+        currentTemplate,
+        {
+          name: `Facture ${duplicatedData.invoice.number}`,
+          createdAt: Date.now(),
+          invoiceNumber: duplicatedData.invoice.number,
+          clientName: duplicatedData.client.name,
+        }
+      );
+
+      set({
+        data: duplicatedData,
+        template: currentTemplate,
+        activeDocumentId: newId,
+        dataVersion: get().dataVersion + 1,
+      });
     },
 
     loadFromJson: (json) => {
@@ -184,13 +242,12 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => {
             template: parsed.template || get().template,
             dataVersion: get().dataVersion + 1
           });
-          saveToLocalStorage(STORAGE_KEYS.DATA, data);
-          saveToLocalStorage(STORAGE_KEYS.TEMPLATE, parsed.template);
+          saveCurrentDocument();
         } else {
           // Direct data import
           const data = InvoiceDataSchema.parse(parsed);
           set({ data, dataVersion: get().dataVersion + 1 });
-          saveToLocalStorage(STORAGE_KEYS.DATA, data);
+          saveCurrentDocument();
         }
       } catch (error) {
         console.error('Failed to parse JSON:', error);
@@ -207,6 +264,43 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => {
         theme: 'cv-default',
       };
       return JSON.stringify(exportData, null, 2);
+    },
+
+    loadDocumentById: (id: string) => {
+      const doc = loadDocument(id);
+      if (doc) {
+        const data = InvoiceDataSchema.parse(doc.data);
+        set({
+          data,
+          template: doc.template || defaultTemplate,
+          activeDocumentId: id,
+          dataVersion: get().dataVersion + 1,
+        });
+      }
+    },
+
+    createDocument: () => {
+      const newId = createNewDocument();
+      const newData = InvoiceDataSchema.parse(sampleData);
+
+      saveDocument(
+        newId,
+        newData,
+        defaultTemplate,
+        {
+          name: `Facture ${newData.invoice.number}`,
+          createdAt: Date.now(),
+          invoiceNumber: newData.invoice.number,
+          clientName: newData.client.name,
+        }
+      );
+
+      set({
+        data: newData,
+        template: defaultTemplate,
+        activeDocumentId: newId,
+        dataVersion: get().dataVersion + 1,
+      });
     },
   };
 });

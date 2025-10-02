@@ -82,89 +82,89 @@ export function SidebarForm() {
   };
 
   return (
-    <div className="h-full overflow-auto bg-white">
-      <form className="space-y-0">
+    <div className="h-full bg-white">
+      <form className="p-4 space-y-0">
         <Accordion.Root
           type="multiple"
           value={openSections}
           onValueChange={setOpenSections}
-          className="space-y-2"
+          className="space-y-1"
         >
           {/* Sender Section */}
-          <Accordion.Item value="sender" className="border-b border-gray-200">
+          <Accordion.Item value="sender" className="border-b border-gray-100">
             <Accordion.Header>
-              <Accordion.Trigger className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-gray-50 transition-colors group bg-white">
-                <span className="text-sm font-semibold text-gray-900 uppercase tracking-wide">{t('sender')}</span>
-                <ChevronDown className="w-4 h-4 text-gray-500 transition-transform group-data-[state=open]:rotate-180" />
+              <Accordion.Trigger className="w-full flex items-center justify-between px-3 py-2.5 hover:bg-gray-50 transition-colors group">
+                <span className="text-xs font-semibold text-gray-700 uppercase tracking-wider">{t('sender')}</span>
+                <ChevronDown className="w-3.5 h-3.5 text-gray-400 transition-transform group-data-[state=open]:rotate-180" />
               </Accordion.Trigger>
             </Accordion.Header>
-            <Accordion.Content className="px-5 py-4 space-y-3.5 bg-gray-50">
+            <Accordion.Content className="px-3 pb-3 space-y-2.5">
               <div>
-                <label htmlFor="sender-name" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="sender-name" className="block text-xs font-medium text-gray-600 mb-1">
                   {t('name')} *
                 </label>
                 <input
                   id="sender-name"
                   {...register('sender.name')}
-                  className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-2.5 py-1.5 text-sm border border-gray-200 focus:outline-none focus:border-gray-400 transition-colors"
                 />
                 {errors.sender?.name && (
-                  <p className="mt-1 text-xs text-red-600">{errors.sender.name.message}</p>
+                  <p className="mt-0.5 text-xs text-red-500">{errors.sender.name.message}</p>
                 )}
               </div>
 
               <div>
-                <label htmlFor="sender-address" className="block text-sm font-medium">
+                <label htmlFor="sender-address" className="block text-xs font-medium text-gray-600 mb-1">
                   {t('address')}
                 </label>
                 <textarea
                   id="sender-address"
                   {...register('sender.address')}
-                  rows={3}
-                  className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  rows={2}
+                  className="w-full px-2.5 py-1.5 text-sm border border-gray-200 focus:outline-none focus:border-gray-400 transition-colors"
                 />
               </div>
 
               <div>
-                <label htmlFor="sender-email" className="block text-sm font-medium">
+                <label htmlFor="sender-email" className="block text-xs font-medium text-gray-600 mb-1">
                   {t('email')}
                 </label>
                 <input
                   id="sender-email"
                   type="email"
                   {...register('sender.email')}
-                  className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-2.5 py-1.5 text-sm border border-gray-200 focus:outline-none focus:border-gray-400 transition-colors"
                 />
                 {errors.sender?.email && (
-                  <p className="mt-1 text-xs text-red-600">{errors.sender.email.message}</p>
+                  <p className="mt-0.5 text-xs text-red-500">{errors.sender.email.message}</p>
                 )}
               </div>
 
               <div>
-                <label htmlFor="sender-phone" className="block text-sm font-medium">
+                <label htmlFor="sender-phone" className="block text-xs font-medium text-gray-600 mb-1">
                   {t('phone')}
                 </label>
                 <input
                   id="sender-phone"
                   {...register('sender.phone')}
-                  className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-2.5 py-1.5 text-sm border border-gray-200 focus:outline-none focus:border-gray-400 transition-colors"
                 />
               </div>
 
               <div>
-                <label htmlFor="sender-bank" className="block text-sm font-medium">
+                <label htmlFor="sender-bank" className="block text-xs font-medium text-gray-600 mb-1">
                   {t('bank')}
                 </label>
                 <textarea
                   id="sender-bank"
                   {...register('sender.bank')}
                   rows={2}
-                  className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-2.5 py-1.5 text-sm border border-gray-200 focus:outline-none focus:border-gray-400 transition-colors"
                 />
               </div>
 
               <div>
-                <label htmlFor="sender-logo" className="block text-sm font-medium">
+                <label htmlFor="sender-logo" className="block text-xs font-medium text-gray-600 mb-1">
                   {t('logo')}
                 </label>
                 <input
@@ -172,141 +172,191 @@ export function SidebarForm() {
                   type="file"
                   accept="image/*"
                   onChange={handleLogoUpload}
-                  className="mt-1 w-full text-sm"
+                  className="w-full text-xs"
                 />
                 {formData.sender?.logo && (
                   <img
                     src={formData.sender.logo}
                     alt="Logo preview"
-                    className="mt-2 max-h-20 border rounded"
+                    className="mt-1.5 max-h-16 border border-gray-200"
                   />
                 )}
               </div>
 
               <div>
-                <label htmlFor="sender-notes" className="block text-sm font-medium">
+                <label htmlFor="sender-notes" className="block text-xs font-medium text-gray-600 mb-1">
                   {t('notes')}
                 </label>
                 <textarea
                   id="sender-notes"
                   {...register('sender.notes')}
                   rows={2}
-                  className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-2.5 py-1.5 text-sm border border-gray-200 focus:outline-none focus:border-gray-400 transition-colors"
                 />
               </div>
             </Accordion.Content>
           </Accordion.Item>
 
           {/* Client Section */}
-          <Accordion.Item value="client" className="border-b border-gray-200">
+          <Accordion.Item value="client" className="border-b border-gray-100">
             <Accordion.Header>
-              <Accordion.Trigger className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-gray-50 transition-colors group bg-white">
-                <span className="text-sm font-semibold text-gray-900 uppercase tracking-wide">{t('client')}</span>
-                <ChevronDown className="w-4 h-4 transition-transform group-data-[state=open]:rotate-180" />
+              <Accordion.Trigger className="w-full flex items-center justify-between px-3 py-2.5 hover:bg-gray-50 transition-colors group">
+                <span className="text-xs font-semibold text-gray-700 uppercase tracking-wider">{t('client')}</span>
+                <ChevronDown className="w-3.5 h-3.5 text-gray-400 transition-transform group-data-[state=open]:rotate-180" />
               </Accordion.Trigger>
             </Accordion.Header>
-            <Accordion.Content className="px-5 py-4 space-y-3.5 bg-gray-50">
+            <Accordion.Content className="px-3 pb-3 space-y-2.5">
               <div>
-                <label htmlFor="client-name" className="block text-sm font-medium">
+                <label htmlFor="client-name" className="block text-xs font-medium text-gray-600 mb-1">
                   {t('name')} *
                 </label>
                 <input
                   id="client-name"
                   {...register('client.name')}
-                  className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-2.5 py-1.5 text-sm border border-gray-200 focus:outline-none focus:border-gray-400 transition-colors"
                 />
                 {errors.client?.name && (
-                  <p className="mt-1 text-xs text-red-600">{errors.client.name.message}</p>
+                  <p className="mt-0.5 text-xs text-red-500">{errors.client.name.message}</p>
                 )}
               </div>
 
               <div>
-                <label htmlFor="client-address" className="block text-sm font-medium">
+                <label htmlFor="client-address" className="block text-xs font-medium text-gray-600 mb-1">
                   {t('address')}
                 </label>
                 <textarea
                   id="client-address"
                   {...register('client.address')}
                   rows={3}
-                  className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-2.5 py-1.5 text-sm border border-gray-200 focus:outline-none focus:border-gray-400 transition-colors"
                 />
               </div>
 
               <div>
-                <label htmlFor="client-reg" className="block text-sm font-medium">
+                <label htmlFor="client-email" className="block text-xs font-medium text-gray-600 mb-1">
+                  {t('email')}
+                </label>
+                <input
+                  id="client-email"
+                  type="email"
+                  {...register('client.email')}
+                  className="w-full px-2.5 py-1.5 text-sm border border-gray-200 focus:outline-none focus:border-gray-400 transition-colors"
+                />
+                {errors.client?.email && (
+                  <p className="mt-0.5 text-xs text-red-500">{errors.client.email.message}</p>
+                )}
+              </div>
+
+              <div>
+                <label htmlFor="client-phone" className="block text-xs font-medium text-gray-600 mb-1">
+                  {t('phone')}
+                </label>
+                <input
+                  id="client-phone"
+                  {...register('client.phone')}
+                  className="w-full px-2.5 py-1.5 text-sm border border-gray-200 focus:outline-none focus:border-gray-400 transition-colors"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="client-bank" className="block text-xs font-medium text-gray-600 mb-1">
+                  {t('bank')}
+                </label>
+                <textarea
+                  id="client-bank"
+                  {...register('client.bank')}
+                  rows={2}
+                  className="w-full px-2.5 py-1.5 text-sm border border-gray-200 focus:outline-none focus:border-gray-400 transition-colors"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="client-reg" className="block text-xs font-medium text-gray-600 mb-1">
                   {t('reg')}
                 </label>
                 <input
                   id="client-reg"
                   {...register('client.reg')}
-                  className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-2.5 py-1.5 text-sm border border-gray-200 focus:outline-none focus:border-gray-400 transition-colors"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="client-notes" className="block text-xs font-medium text-gray-600 mb-1">
+                  {t('notes')}
+                </label>
+                <textarea
+                  id="client-notes"
+                  {...register('client.notes')}
+                  rows={2}
+                  className="w-full px-2.5 py-1.5 text-sm border border-gray-200 focus:outline-none focus:border-gray-400 transition-colors"
                 />
               </div>
             </Accordion.Content>
           </Accordion.Item>
 
           {/* Invoice Section */}
-          <Accordion.Item value="invoice" className="border-b border-gray-200">
+          <Accordion.Item value="invoice" className="border-b border-gray-100">
             <Accordion.Header>
-              <Accordion.Trigger className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-gray-50 transition-colors group bg-white">
-                <span className="text-sm font-semibold text-gray-900 uppercase tracking-wide">{t('invoice')}</span>
-                <ChevronDown className="w-4 h-4 transition-transform group-data-[state=open]:rotate-180" />
+              <Accordion.Trigger className="w-full flex items-center justify-between px-3 py-2.5 hover:bg-gray-50 transition-colors group">
+                <span className="text-xs font-semibold text-gray-700 uppercase tracking-wider">{t('invoice')}</span>
+                <ChevronDown className="w-3.5 h-3.5 text-gray-400 transition-transform group-data-[state=open]:rotate-180" />
               </Accordion.Trigger>
             </Accordion.Header>
-            <Accordion.Content className="px-5 py-4 space-y-3.5 bg-gray-50">
+            <Accordion.Content className="px-3 pb-3 space-y-2.5">
               <div>
-                <label htmlFor="invoice-number" className="block text-sm font-medium">
+                <label htmlFor="invoice-number" className="block text-xs font-medium text-gray-600 mb-1">
                   {t('number')} *
                 </label>
                 <input
                   id="invoice-number"
                   {...register('invoice.number')}
-                  className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-2.5 py-1.5 text-sm border border-gray-200 focus:outline-none focus:border-gray-400 transition-colors"
                 />
                 {errors.invoice?.number && (
-                  <p className="mt-1 text-xs text-red-600">{errors.invoice.number.message}</p>
+                  <p className="mt-0.5 text-xs text-red-500">{errors.invoice.number.message}</p>
                 )}
               </div>
 
               <div>
-                <label htmlFor="invoice-date" className="block text-sm font-medium">
+                <label htmlFor="invoice-date" className="block text-xs font-medium text-gray-600 mb-1">
                   {t('date')} *
                 </label>
                 <input
                   id="invoice-date"
                   type="date"
                   {...register('invoice.date')}
-                  className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-2.5 py-1.5 text-sm border border-gray-200 focus:outline-none focus:border-gray-400 transition-colors"
                 />
                 {errors.invoice?.date && (
-                  <p className="mt-1 text-xs text-red-600">{errors.invoice.date.message}</p>
+                  <p className="mt-0.5 text-xs text-red-500">{errors.invoice.date.message}</p>
                 )}
               </div>
 
               <div>
-                <label htmlFor="invoice-subject" className="block text-sm font-medium">
+                <label htmlFor="invoice-subject" className="block text-xs font-medium text-gray-600 mb-1">
                   {t('subject')}
                 </label>
                 <input
                   id="invoice-subject"
                   {...register('invoice.subject')}
-                  className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-2.5 py-1.5 text-sm border border-gray-200 focus:outline-none focus:border-gray-400 transition-colors"
                 />
               </div>
 
               <div>
-                <label htmlFor="invoice-payment-terms" className="block text-sm font-medium">
+                <label htmlFor="invoice-payment-terms" className="block text-xs font-medium text-gray-600 mb-1">
                   {t('paymentTerms')}
                 </label>
                 <input
                   id="invoice-payment-terms"
                   {...register('invoice.payment_terms')}
-                  className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-2.5 py-1.5 text-sm border border-gray-200 focus:outline-none focus:border-gray-400 transition-colors"
                 />
               </div>
 
               <div>
-                <label htmlFor="invoice-currency" className="block text-sm font-medium">
+                <label htmlFor="invoice-currency" className="block text-xs font-medium text-gray-600 mb-1">
                   {t('currency')} *
                 </label>
                 <Controller
@@ -314,10 +364,10 @@ export function SidebarForm() {
                   control={control}
                   render={({ field }) => (
                     <Select.Root value={field.value} onValueChange={field.onChange}>
-                      <Select.Trigger className="mt-1 w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                      <Select.Trigger className="w-full flex items-center justify-between px-2.5 py-1.5 text-sm border border-gray-200 hover:bg-gray-50 focus:outline-none focus:border-gray-400 transition-colors">
                         <Select.Value />
                         <Select.Icon>
-                          <ChevronDown className="w-4 h-4" />
+                          <ChevronDown className="w-3.5 h-3.5" />
                         </Select.Icon>
                       </Select.Trigger>
                       <Select.Portal>
@@ -346,18 +396,18 @@ export function SidebarForm() {
           </Accordion.Item>
 
           {/* Items Section */}
-          <Accordion.Item value="items" className="border-b border-gray-200">
+          <Accordion.Item value="items" className="border-b border-gray-100">
             <Accordion.Header>
-              <Accordion.Trigger className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-gray-50 transition-colors group bg-white">
-                <span className="text-sm font-semibold text-gray-900 uppercase tracking-wide">{t('items')}</span>
-                <ChevronDown className="w-4 h-4 transition-transform group-data-[state=open]:rotate-180" />
+              <Accordion.Trigger className="w-full flex items-center justify-between px-3 py-2.5 hover:bg-gray-50 transition-colors group">
+                <span className="text-xs font-semibold text-gray-700 uppercase tracking-wider">{t('items')}</span>
+                <ChevronDown className="w-3.5 h-3.5 text-gray-400 transition-transform group-data-[state=open]:rotate-180" />
               </Accordion.Trigger>
             </Accordion.Header>
-            <Accordion.Content className="px-5 py-4 space-y-3.5 bg-gray-50">
+            <Accordion.Content className="px-3 pb-3 space-y-2.5">
               {itemFields.map((field, index) => (
-                <div key={field.id} className="border rounded-lg p-4 space-y-3 bg-gray-50">
+                <div key={field.id} className="border border-gray-200 p-3 space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-700">Item {index + 1}</span>
+                    <span className="text-xs font-medium text-gray-600">Item {index + 1}</span>
                     <button
                       type="button"
                       onClick={() => removeItem(index)}
@@ -369,14 +419,14 @@ export function SidebarForm() {
                   </div>
 
                   <div>
-                    <label htmlFor={`item-description-${index}`} className="block text-sm font-medium">{t('description')} *</label>
+                    <label htmlFor={`item-description-${index}`} className="block text-xs font-medium text-gray-600 mb-1">{t('description')} *</label>
                     <input
                       id={`item-description-${index}`}
                       {...register(`items.${index}.description`)}
-                      className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-2.5 py-1.5 text-sm border border-gray-200 focus:outline-none focus:border-gray-400 transition-colors"
                     />
                     {errors.items?.[index]?.description && (
-                      <p className="mt-1 text-xs text-red-600">
+                      <p className="mt-0.5 text-xs text-red-500">
                         {errors.items[index]?.description?.message}
                       </p>
                     )}
@@ -384,32 +434,32 @@ export function SidebarForm() {
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label htmlFor={`item-qty-${index}`} className="block text-sm font-medium">{t('qty')} *</label>
+                      <label htmlFor={`item-qty-${index}`} className="block text-xs font-medium text-gray-600 mb-1">{t('qty')} *</label>
                       <input
                         id={`item-qty-${index}`}
                         type="number"
                         step="1"
                         {...register(`items.${index}.qty`, { valueAsNumber: true })}
-                        className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-2.5 py-1.5 text-sm border border-gray-200 focus:outline-none focus:border-gray-400 transition-colors"
                       />
                       {errors.items?.[index]?.qty && (
-                        <p className="mt-1 text-xs text-red-600">
+                        <p className="mt-0.5 text-xs text-red-500">
                           {errors.items[index]?.qty?.message}
                         </p>
                       )}
                     </div>
 
                     <div>
-                      <label htmlFor={`item-unit-price-${index}`} className="block text-sm font-medium">{t('unitPrice')} *</label>
+                      <label htmlFor={`item-unit-price-${index}`} className="block text-xs font-medium text-gray-600 mb-1">{t('unitPrice')} *</label>
                       <input
                         id={`item-unit-price-${index}`}
                         type="number"
                         step="0.01"
                         {...register(`items.${index}.unit_price`, { valueAsNumber: true })}
-                        className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-2.5 py-1.5 text-sm border border-gray-200 focus:outline-none focus:border-gray-400 transition-colors"
                       />
                       {errors.items?.[index]?.unit_price && (
-                        <p className="mt-1 text-xs text-red-600">
+                        <p className="mt-0.5 text-xs text-red-500">
                           {errors.items[index]?.unit_price?.message}
                         </p>
                       )}
@@ -417,13 +467,13 @@ export function SidebarForm() {
                   </div>
 
                   <div>
-                    <label htmlFor={`item-discount-${index}`} className="block text-sm font-medium">{t('discount')}</label>
+                    <label htmlFor={`item-discount-${index}`} className="block text-xs font-medium text-gray-600 mb-1">{t('discount')}</label>
                     <input
                       id={`item-discount-${index}`}
                       type="number"
                       step="0.1"
                       {...register(`items.${index}.discount`, { valueAsNumber: true })}
-                      className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-2.5 py-1.5 text-sm border border-gray-200 focus:outline-none focus:border-gray-400 transition-colors"
                     />
                   </div>
                 </div>
@@ -434,7 +484,7 @@ export function SidebarForm() {
                 onClick={() =>
                   appendItem({ description: '', qty: 1, unit_price: 0, discount: 0 })
                 }
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors"
+                className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs border border-dashed border-gray-300 hover:border-gray-400 hover:bg-gray-50 transition-colors"
               >
                 <Plus className="w-4 h-4" />
                 {t('addItem')}
@@ -443,16 +493,16 @@ export function SidebarForm() {
           </Accordion.Item>
 
           {/* Summary Section */}
-          <Accordion.Item value="summary" className="border-b border-gray-200">
+          <Accordion.Item value="summary" className="border-b border-gray-100">
             <Accordion.Header>
-              <Accordion.Trigger className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-gray-50 transition-colors group bg-white">
-                <span className="text-sm font-semibold text-gray-900 uppercase tracking-wide">{t('summary')}</span>
-                <ChevronDown className="w-4 h-4 transition-transform group-data-[state=open]:rotate-180" />
+              <Accordion.Trigger className="w-full flex items-center justify-between px-3 py-2.5 hover:bg-gray-50 transition-colors group">
+                <span className="text-xs font-semibold text-gray-700 uppercase tracking-wider">{t('summary')}</span>
+                <ChevronDown className="w-3.5 h-3.5 text-gray-400 transition-transform group-data-[state=open]:rotate-180" />
               </Accordion.Trigger>
             </Accordion.Header>
-            <Accordion.Content className="px-5 py-4 space-y-3.5 bg-gray-50">
+            <Accordion.Content className="px-3 pb-3 space-y-2.5">
               <div>
-                <label htmlFor="global-discount" className="block text-sm font-medium">
+                <label htmlFor="global-discount" className="block text-xs font-medium text-gray-600 mb-1">
                   {t('globalDiscount')}
                 </label>
                 <input
@@ -460,17 +510,17 @@ export function SidebarForm() {
                   type="number"
                   step="0.1"
                   {...register('summary.global_discount', { valueAsNumber: true })}
-                  className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-2.5 py-1.5 text-sm border border-gray-200 focus:outline-none focus:border-gray-400 transition-colors"
                 />
               </div>
 
               <div className="space-y-3">
-                <div className="text-sm font-medium text-gray-700">{t('taxes')}</div>
+                <div className="text-xs font-medium text-gray-600">{t('taxes')}</div>
 
                 {taxFields.map((field, index) => (
-                  <div key={field.id} className="border rounded-lg p-4 space-y-3 bg-gray-50">
+                  <div key={field.id} className="border border-gray-200 p-3 space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-gray-700">Tax {index + 1}</span>
+                      <span className="text-xs font-medium text-gray-600">Tax {index + 1}</span>
                       <button
                         type="button"
                         onClick={() => removeTax(index)}
@@ -482,30 +532,30 @@ export function SidebarForm() {
                     </div>
 
                     <div>
-                      <label htmlFor={`tax-label-${index}`} className="block text-sm font-medium">Label *</label>
+                      <label htmlFor={`tax-label-${index}`} className="block text-xs font-medium text-gray-600 mb-1">Label *</label>
                       <input
                         id={`tax-label-${index}`}
                         {...register(`summary.taxes.${index}.label`)}
-                        className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-2.5 py-1.5 text-sm border border-gray-200 focus:outline-none focus:border-gray-400 transition-colors"
                       />
                       {errors.summary?.taxes?.[index]?.label && (
-                        <p className="mt-1 text-xs text-red-600">
+                        <p className="mt-0.5 text-xs text-red-500">
                           {errors.summary.taxes[index]?.label?.message}
                         </p>
                       )}
                     </div>
 
                     <div>
-                      <label htmlFor={`tax-rate-${index}`} className="block text-sm font-medium">Rate (%) *</label>
+                      <label htmlFor={`tax-rate-${index}`} className="block text-xs font-medium text-gray-600 mb-1">Rate (%) *</label>
                       <input
                         id={`tax-rate-${index}`}
                         type="number"
                         step="0.1"
                         {...register(`summary.taxes.${index}.rate`, { valueAsNumber: true })}
-                        className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-2.5 py-1.5 text-sm border border-gray-200 focus:outline-none focus:border-gray-400 transition-colors"
                       />
                       {errors.summary?.taxes?.[index]?.rate && (
-                        <p className="mt-1 text-xs text-red-600">
+                        <p className="mt-0.5 text-xs text-red-500">
                           {errors.summary.taxes[index]?.rate?.message}
                         </p>
                       )}
@@ -516,7 +566,7 @@ export function SidebarForm() {
                 <button
                   type="button"
                   onClick={() => appendTax({ label: 'VAT', rate: 18 })}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors"
+                  className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs border border-dashed border-gray-300 hover:border-gray-400 hover:bg-gray-50 transition-colors"
                 >
                   <Plus className="w-4 h-4" />
                   {t('addTax')}
@@ -526,34 +576,34 @@ export function SidebarForm() {
           </Accordion.Item>
 
           {/* Footer Section */}
-          <Accordion.Item value="footer" className="border-b border-gray-200">
+          <Accordion.Item value="footer" className="border-b border-gray-100">
             <Accordion.Header>
-              <Accordion.Trigger className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-gray-50 transition-colors group bg-white">
-                <span className="text-sm font-semibold text-gray-900 uppercase tracking-wide">{t('footer')}</span>
-                <ChevronDown className="w-4 h-4 transition-transform group-data-[state=open]:rotate-180" />
+              <Accordion.Trigger className="w-full flex items-center justify-between px-3 py-2.5 hover:bg-gray-50 transition-colors group">
+                <span className="text-xs font-semibold text-gray-700 uppercase tracking-wider">{t('footer')}</span>
+                <ChevronDown className="w-3.5 h-3.5 text-gray-400 transition-transform group-data-[state=open]:rotate-180" />
               </Accordion.Trigger>
             </Accordion.Header>
-            <Accordion.Content className="px-5 py-4 space-y-3.5 bg-gray-50">
+            <Accordion.Content className="px-3 pb-3 space-y-2.5">
               <div>
-                <label htmlFor="footer-legal" className="block text-sm font-medium">
+                <label htmlFor="footer-legal" className="block text-xs font-medium text-gray-600 mb-1">
                   {t('legal')}
                 </label>
                 <textarea
                   id="footer-legal"
                   {...register('footer.legal')}
                   rows={3}
-                  className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-2.5 py-1.5 text-sm border border-gray-200 focus:outline-none focus:border-gray-400 transition-colors"
                 />
               </div>
 
               <div>
-                <label htmlFor="footer-signature" className="block text-sm font-medium">
+                <label htmlFor="footer-signature" className="block text-xs font-medium text-gray-600 mb-1">
                   {t('signature')}
                 </label>
                 <input
                   id="footer-signature"
                   {...register('footer.signature')}
-                  className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-2.5 py-1.5 text-sm border border-gray-200 focus:outline-none focus:border-gray-400 transition-colors"
                 />
               </div>
             </Accordion.Content>

@@ -34,7 +34,11 @@ export const InvoiceDataSchema = z.object({
   client: z.object({
     name: z.string().min(1, 'Client name is required'),
     address: z.string().optional(),
+    email: z.string().email().optional().or(z.literal('')),
+    phone: z.string().optional(),
+    bank: z.string().optional(),
     reg: z.string().optional(), // RCCM/IFU
+    notes: z.string().optional(),
   }),
 
   invoice: z.object({

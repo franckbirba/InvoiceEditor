@@ -1,11 +1,12 @@
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
-import { FileText, Copy, Download, Upload, Printer, Eye, Code } from 'lucide-react';
+import { FileText, Copy, Download, Upload, Printer, Eye, Code, FolderOpen } from 'lucide-react';
 import { useInvoiceStore } from '../features/invoice/useInvoiceStore';
 import { printInvoice } from '../lib/print';
 import { JsonImportExport } from './JsonImportExport';
 import { LanguageToggle } from './LanguageToggle';
 import { ThemeSwitcher } from './ThemeSwitcher';
+import { DocumentsDialog } from './DocumentsDialog';
 import { useToast } from './Toast';
 
 export function Topbar() {
@@ -13,6 +14,7 @@ export function Topbar() {
   const { showToast } = useToast();
   const { isEditorMode, toggleEditorMode, resetToSample, duplicateInvoice } = useInvoiceStore();
   const [showImportExport, setShowImportExport] = React.useState(false);
+  const [showDocuments, setShowDocuments] = React.useState(false);
 
   const handleNew = () => {
     if (window.confirm(t('confirmReset'))) {
@@ -52,6 +54,15 @@ export function Topbar() {
 
           {/* Center: Actions */}
           <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowDocuments(true)}
+              className="flex items-center gap-2 px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              title="Mes factures"
+            >
+              <FolderOpen className="w-4 h-4" />
+              <span className="hidden sm:inline">Mes factures</span>
+            </button>
+
             <button
               onClick={handleNew}
               className="flex items-center gap-2 px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
@@ -125,6 +136,7 @@ export function Topbar() {
       </header>
 
       <JsonImportExport open={showImportExport} onOpenChange={setShowImportExport} />
+      <DocumentsDialog open={showDocuments} onOpenChange={setShowDocuments} />
     </>
   );
 }
