@@ -1,0 +1,134 @@
+<div class="invoice-preview" id="invoice-content">
+  <!-- Header -->
+  <div class="invoice-header">
+    <h1 class="invoice-title">{{#locale}}{{#if (eq locale "fr")}}FACTURE{{else}}INVOICE{{/if}}{{/locale}}</h1>
+    <div class="invoice-meta">
+      <div>
+        <strong>{{#locale}}{{#if (eq locale "fr")}}N°{{else}}No.{{/if}}{{/locale}}</strong> {{invoice.number}}
+      </div>
+      <div>
+        <strong>{{#locale}}{{#if (eq locale "fr")}}Date{{else}}Date{{/if}}{{/locale}}:</strong> {{formatted.date}}
+      </div>
+    </div>
+  </div>
+
+  <!-- Parties -->
+  <div class="invoice-parties">
+    <!-- Sender -->
+    <div class="party-card">
+      <h3>{{#locale}}{{#if (eq locale "fr")}}Émetteur{{else}}Sender{{/if}}{{/locale}}</h3>
+      {{#sender.logo}}
+      <img src="{{sender.logo}}" alt="Logo" style="max-width: 100px; margin-bottom: 8px;" />
+      {{/sender.logo}}
+      <p><strong>{{sender.name}}</strong></p>
+      {{#sender.address}}
+      <p style="white-space: pre-line;">{{sender.address}}</p>
+      {{/sender.address}}
+      {{#sender.email}}
+      <p>{{sender.email}}</p>
+      {{/sender.email}}
+      {{#sender.phone}}
+      <p>{{sender.phone}}</p>
+      {{/sender.phone}}
+      {{#sender.bank}}
+      <p style="white-space: pre-line;">{{sender.bank}}</p>
+      {{/sender.bank}}
+      {{#sender.notes}}
+      <p><em>{{sender.notes}}</em></p>
+      {{/sender.notes}}
+    </div>
+
+    <!-- Client -->
+    <div class="party-card">
+      <h3>{{#locale}}{{#if (eq locale "fr")}}Client{{else}}Client{{/if}}{{/locale}}</h3>
+      <p><strong>{{client.name}}</strong></p>
+      {{#client.address}}
+      <p style="white-space: pre-line;">{{client.address}}</p>
+      {{/client.address}}
+      {{#client.reg}}
+      <p>{{client.reg}}</p>
+      {{/client.reg}}
+    </div>
+  </div>
+
+  <!-- Subject -->
+  {{#invoice.subject}}
+  <div style="margin-bottom: 24px; padding: 12px; background: #f8fafc; border-radius: 8px;">
+    <strong>{{#locale}}{{#if (eq locale "fr")}}Objet{{else}}Subject{{/if}}{{/locale}}:</strong> {{invoice.subject}}
+  </div>
+  {{/invoice.subject}}
+
+  <!-- Items Table -->
+  <table class="invoice-table">
+    <thead>
+      <tr>
+        <th>{{#locale}}{{#if (eq locale "fr")}}Désignation{{else}}Description{{/if}}{{/locale}}</th>
+        <th style="text-align: center;">{{#locale}}{{#if (eq locale "fr")}}Qté{{else}}Qty{{/if}}{{/locale}}</th>
+        <th style="text-align: right;">{{#locale}}{{#if (eq locale "fr")}}P.U.{{else}}Unit Price{{/if}}{{/locale}}</th>
+        {{#items_with_totals.0.discount}}
+        <th style="text-align: right;">{{#locale}}{{#if (eq locale "fr")}}Remise{{else}}Disc.{{/if}}{{/locale}}</th>
+        {{/items_with_totals.0.discount}}
+        <th style="text-align: right;">Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#items_with_totals}}
+      <tr>
+        <td>{{description}}</td>
+        <td style="text-align: center;">{{qty_formatted}}</td>
+        <td class="text-right">{{unit_price_formatted}}</td>
+        {{#discount}}
+        <td class="text-right">{{discount}}%</td>
+        {{/discount}}
+        <td class="text-right"><strong>{{line_total_formatted}}</strong></td>
+      </tr>
+      {{/items_with_totals}}
+    </tbody>
+  </table>
+
+  <!-- Summary -->
+  <div class="invoice-summary">
+    <div class="summary-row">
+      <span>{{#locale}}{{#if (eq locale "fr")}}Sous-total{{else}}Subtotal{{/if}}{{/locale}}:</span>
+      <span>{{formatted.subtotal}}</span>
+    </div>
+
+    {{#summary.global_discount}}
+    <div class="summary-row">
+      <span>{{#locale}}{{#if (eq locale "fr")}}Remise globale{{else}}Global Discount{{/if}}{{/locale}} ({{summary.global_discount}}%):</span>
+      <span>-{{formatted.afterGlobalDiscount}}</span>
+    </div>
+    {{/summary.global_discount}}
+
+    {{#totals.taxes}}
+    <div class="summary-row">
+      <span>{{label}} ({{rate}}%):</span>
+      <span>{{amount}}</span>
+    </div>
+    {{/totals.taxes}}
+
+    <div class="summary-row total">
+      <span><strong>{{#locale}}{{#if (eq locale "fr")}}TOTAL{{else}}TOTAL{{/if}}{{/locale}}</strong></span>
+      <span><strong>{{formatted.total}}</strong></span>
+    </div>
+  </div>
+
+  <!-- Payment Terms -->
+  {{#invoice.payment_terms}}
+  <div style="margin-bottom: 24px; padding: 12px; background: #eff6ff; border-left: 4px solid #2563eb;">
+    <strong>{{#locale}}{{#if (eq locale "fr")}}Conditions de paiement{{else}}Payment Terms{{/if}}{{/locale}}:</strong> {{invoice.payment_terms}}
+  </div>
+  {{/invoice.payment_terms}}
+
+  <!-- Footer -->
+  <div class="invoice-footer">
+    {{#footer.legal}}
+    <p>{{footer.legal}}</p>
+    {{/footer.legal}}
+    {{#footer.signature}}
+    <div style="margin-top: 24px;">
+      <img src="{{footer.signature}}" alt="Signature" style="max-width: 200px;" />
+    </div>
+    {{/footer.signature}}
+  </div>
+</div>

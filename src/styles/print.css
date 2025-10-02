@@ -1,0 +1,110 @@
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 12mm 15mm;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    background: white;
+  }
+
+  /* Hide UI elements */
+  .no-print,
+  button,
+  nav,
+  .topbar,
+  .sidebar,
+  .editor,
+  .controls {
+    display: none !important;
+  }
+
+  /* Invoice preview takes full width */
+  .invoice-preview {
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+    box-shadow: none;
+    border: none;
+  }
+
+  /* Remove shadows and decorations */
+  .card,
+  .party-card {
+    box-shadow: none;
+    page-break-inside: avoid;
+  }
+
+  /* Ensure proper page breaks */
+  .invoice-header {
+    page-break-after: avoid;
+  }
+
+  .invoice-table {
+    page-break-inside: avoid;
+  }
+
+  .invoice-table thead {
+    display: table-header-group;
+  }
+
+  .invoice-table tbody tr {
+    page-break-inside: avoid;
+  }
+
+  .invoice-summary {
+    page-break-inside: avoid;
+  }
+
+  .invoice-footer {
+    page-break-inside: avoid;
+  }
+
+  /* Adjust colors for print */
+  * {
+    color: #000 !important;
+    background: transparent !important;
+  }
+
+  .invoice-table tbody tr:nth-child(even) {
+    background-color: #f8f8f8 !important;
+  }
+
+  .invoice-header {
+    border-bottom-color: #2563eb !important;
+  }
+
+  .summary-row.total {
+    border-top-color: #2563eb !important;
+    border-bottom-color: #2563eb !important;
+  }
+
+  /* Ensure images print */
+  img {
+    max-width: 100%;
+    page-break-inside: avoid;
+  }
+
+  /* Font optimization for print */
+  body, .invoice-preview {
+    font-size: 11pt;
+  }
+
+  h1, .invoice-title {
+    font-size: 18pt;
+  }
+
+  h2, h3 {
+    font-size: 12pt;
+  }
+
+  /* Ensure borders print */
+  .invoice-table,
+  .invoice-table th,
+  .invoice-table td,
+  .party-card {
+    border-color: #666 !important;
+  }
+}
