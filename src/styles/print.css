@@ -10,6 +10,19 @@
     background: white;
   }
 
+  /* Remove container constraints */
+  .w-full,
+  .overflow-auto,
+  .bg-gray-100,
+  .flex {
+    width: 100% !important;
+    overflow: visible !important;
+    background: white !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: block !important;
+  }
+
   /* Hide UI elements */
   .no-print,
   button,
@@ -28,6 +41,16 @@
     padding: 0;
     box-shadow: none;
     border: none;
+    transform: none !important;
+    width: 100% !important;
+  }
+
+  /* Reset transform and width for print */
+  .bg-white.shadow-lg {
+    transform: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-shadow: none !important;
   }
 
   /* Remove shadows and decorations */
