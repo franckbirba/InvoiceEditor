@@ -1,0 +1,315 @@
+schema_name: "Theme"
+purpose: "Define CSS styling for document templates"
+
+css_architecture:
+  css_variables:
+    purpose: "Define themeable values"
+    location: ":root selector"
+    categories:
+      - "Colors (bg, fg, accent, borders)"
+      - "Typography (fonts, sizes)"
+      - "Layout (spacing, widths)"
+
+  scoping:
+    purpose: "Prevent style conflicts"
+    method: "Scope all selectors to document type"
+    pattern: ".{typeId}-preview { ... }"
+
+  responsive:
+    purpose: "Support different views"
+    requirements:
+      - "Include @media print styles"
+      - "Use relative units (rem, em, %)"
+      - "Support A4 page size"
+
+required_css_variables:
+  colors:
+    "--color-bg":
+      description: "Background color"
+      example: "#ffffff"
+
+    "--color-fg":
+      description: "Foreground/text color"
+      example: "#333333"
+
+    "--color-accent":
+      description: "Primary accent color"
+      example: "#6aaf50"
+
+    "--color-muted":
+      description: "Secondary/muted text"
+      example: "#666666"
+
+    "--color-border":
+      description: "Border and divider color"
+      example: "#dddddd"
+
+  typography:
+    "--font-mono":
+      description: "Primary font family"
+      example: "'Courier New', monospace"
+
+    "--h1":
+      description: "Heading 1 size"
+      example: "24px"
+
+    "--h2":
+      description: "Heading 2 size"
+      example: "18px"
+
+    "--text":
+      description: "Body text size"
+      example: "14px"
+
+  layout:
+    "--page-w":
+      description: "Maximum page width"
+      example: "794px"
+
+    "--page-pad":
+      description: "Page padding"
+      example: "40px"
+
+    "--gap":
+      description: "Standard spacing"
+      example: "16px"
+
+class_naming_conventions:
+  root_container:
+    pattern: ".{typeId}-preview"
+    purpose: "Main scoping class"
+    example: ".invoice-preview, .cv-preview"
+
+  sections:
+    pattern: ".{section}-section"
+    purpose: "Major document sections"
+    examples:
+      - ".header-section"
+      - ".items-section"
+      - ".summary-section"
+
+  components:
+    pattern: ".{component}-{element}"
+    purpose: "Reusable components"
+    examples:
+      - ".info-box"
+      - ".content-row"
+      - ".data-table"
+
+  utilities:
+    pattern: ".{utility}-{variant}"
+    purpose: "Utility classes"
+    examples:
+      - ".text-right"
+      - ".text-muted"
+      - ".mt-2"
+
+css_structure:
+  order:
+    1: ":root variables"
+    2: "Container/layout styles"
+    3: "Typography styles"
+    4: "Component styles"
+    5: "Utility classes"
+    6: "Print media queries"
+    7: "@page rules"
+
+  example: |
+    :root {
+      /* Variables */
+    }
+
+    .document-preview {
+      /* Container */
+    }
+
+    .document-header {
+      /* Components */
+    }
+
+    @media print {
+      /* Print styles */
+    }
+
+    @page {
+      /* Page setup */
+    }
+
+design_patterns:
+  modern_minimal:
+    description: "Clean, lots of whitespace"
+    colors: "Monochrome with subtle accent"
+    fonts: "Sans-serif, good spacing"
+    example: |
+      :root {
+        --color-bg: #ffffff;
+        --color-fg: #1a1a1a;
+        --color-accent: #2563eb;
+        --font-mono: -apple-system, sans-serif;
+      }
+
+  terminal_tech:
+    description: "Developer/tech aesthetic"
+    colors: "Green accent on dark/light"
+    fonts: "Monospace"
+    example: |
+      :root {
+        --color-bg: #ffffff;
+        --color-fg: #333333;
+        --color-accent: #6aaf50;
+        --font-mono: 'Courier New', monospace;
+      }
+
+  professional_classic:
+    description: "Traditional business look"
+    colors: "Navy/grey with gold accent"
+    fonts: "Serif headings, sans body"
+    example: |
+      :root {
+        --color-bg: #ffffff;
+        --color-fg: #1a1a1a;
+        --color-accent: #c9a961;
+        --font-heading: 'Playfair Display', serif;
+        --font-body: 'Lato', sans-serif;
+      }
+
+print_styles:
+  purpose: "Optimize for PDF export/printing"
+  requirements:
+    - "Set @page size (usually A4)"
+    - "Adjust margins for print"
+    - "Hide interactive elements"
+    - "Use page-break properties"
+
+  example: |
+    @media print {
+      .document-preview {
+        padding: 20px;
+        max-width: 100%;
+      }
+
+      .content-box {
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+
+      .no-print {
+        display: none;
+      }
+    }
+
+    @page {
+      size: A4;
+      margin: 15mm;
+    }
+
+responsive_units:
+  use_relative:
+    - "rem/em for typography"
+    - "% for widths"
+    - "vw/vh sparingly"
+
+  avoid_fixed:
+    - "Avoid px for fonts (use rem)"
+    - "Avoid fixed heights"
+    - "Use min/max for constraints"
+
+common_components:
+  header:
+    purpose: "Document title and meta"
+    classes: [".document-header", ".document-title", ".document-meta"]
+    example: |
+      .document-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid var(--color-accent);
+      }
+
+      .document-title {
+        font-size: var(--h1);
+        font-weight: bold;
+        margin: 0;
+      }
+
+  info_box:
+    purpose: "Contact info, addresses"
+    classes: [".info-box", ".info-row"]
+    example: |
+      .info-box {
+        padding: 1rem;
+        background: var(--color-box-bg, #f9f9f9);
+        border-radius: 4px;
+        line-height: 1.6;
+      }
+
+  data_table:
+    purpose: "Line items, records"
+    classes: [".data-table", "thead", "tbody"]
+    example: |
+      .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1rem 0;
+      }
+
+      .data-table thead th {
+        text-align: left;
+        padding: 0.5rem;
+        border-bottom: 2px solid var(--color-accent);
+        font-weight: 600;
+      }
+
+      .data-table tbody td {
+        padding: 0.5rem;
+        border-bottom: 1px solid var(--color-border);
+      }
+
+  summary_section:
+    purpose: "Totals, calculations"
+    classes: [".summary-section", ".summary-row"]
+    example: |
+      .summary-section {
+        margin-top: 2rem;
+        max-width: 400px;
+        margin-left: auto;
+      }
+
+      .summary-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid var(--color-border);
+      }
+
+      .summary-row.total {
+        font-size: 1.2em;
+        font-weight: bold;
+        border-top: 2px solid var(--color-accent);
+      }
+
+best_practices:
+  - "Start with :root variables for all themeable values"
+  - "Use CSS custom properties for dynamic values"
+  - "Keep specificity low (single class selectors)"
+  - "Avoid !important unless necessary"
+  - "Group related styles together"
+  - "Add comments for complex sections"
+  - "Test with different content lengths"
+  - "Ensure print styles are present"
+
+accessibility:
+  - "Maintain WCAG color contrast ratios"
+  - "Use relative font sizes"
+  - "Ensure focus states for interactive elements"
+  - "Don't rely on color alone for meaning"
+
+examples_reference:
+  - path: "examples/themes/terminal-theme.css"
+    description: "Terminal-style monospace theme"
+
+  - path: "examples/themes/modern-theme.css"
+    description: "Modern minimal theme"
+
+  - path: "examples/themes/classic-theme.css"
+    description: "Professional classic theme"

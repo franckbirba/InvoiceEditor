@@ -1,0 +1,109 @@
+<div class="cv-preview" id="cv-content">
+  <!-- Header with double line separator -->
+  <div class="cv-header">
+    <div class="double-separator"></div>
+    <h1 class="cv-title"><span data-field="header.name">{{header.name}}</span></h1>
+    <div class="cv-subtitle"><span data-field="header.title">{{header.title}}</span></div>
+    <div class="double-separator"></div>
+  </div>
+
+  <!-- Identity Section -->
+  {{#identity.summary}}
+  <div class="cv-section">
+    <div class="section-title">~/cv/identity: <span class="command">whoami</span></div>
+    <div class="content-box">
+      <div class="section-content"><span data-field="identity.summary">{{identity.summary}}</span></div>
+    </div>
+  </div>
+  {{/identity.summary}}
+
+  <!-- Contact Section -->
+  <div class="cv-section">
+    <div class="section-title">~/cv/contact: <span class="command">cat contact.txt</span></div>
+    <div class="content-box">
+      {{#contact.email}}
+      <div class="contact-line">📧 <span data-field="contact.email">{{contact.email}}</span></div>
+      {{/contact.email}}
+      {{#contact.phone}}
+      <div class="contact-line">📱 <span data-field="contact.phone">{{contact.phone}}</span></div>
+      {{/contact.phone}}
+      {{#contact.location}}
+      <div class="contact-line">📍 <span data-field="contact.location">{{contact.location}}</span></div>
+      {{/contact.location}}
+    </div>
+  </div>
+
+  <!-- Experience Section -->
+  <div class="cv-section">
+    <div class="section-title">~/cv/experience: <span class="command">cat experience.txt</span></div>
+    <div class="content-box">
+      {{#experiences}}
+      <div class="experience-item" data-item-index="{{index}}">
+        <div class="experience-header">
+          <span class="experience-period">[<span data-field="experiences.{{index}}.period">{{period}}</span>]</span> <span class="arrow">▶</span> <strong><span data-field="experiences.{{index}}.company">{{company}}</span></strong> – <span data-field="experiences.{{index}}.position">{{position}}</span>
+        </div>
+        {{#description}}
+        <div class="experience-description"><span data-field="experiences.{{index}}.description">{{description}}</span></div>
+        {{/description}}
+        {{#achievements}}
+        <div class="experience-achievements"><span data-field="experiences.{{index}}.achievements">{{{achievements}}}</span></div>
+        {{/achievements}}
+      </div>
+      {{/experiences}}
+    </div>
+  </div>
+
+  <!-- Skills Section -->
+  <div class="cv-section">
+    <div class="section-title">~/cv/skills: <span class="command">cat tech-skills.txt</span></div>
+    <div class="content-box skills-section" data-array-container="skills">
+      {{#skills}}
+      <div class="skill-category" data-item-index="{{index}}">
+        <strong><span data-field="skills.{{index}}.category">{{category}}</span>:</strong> <span class="skill-items" data-field="skills.{{index}}.items">{{items}}</span>
+      </div>
+      {{/skills}}
+    </div>
+  </div>
+
+  <!-- Education Section -->
+  <div class="cv-section">
+    <div class="section-title">~/cv/formation: <span class="command">tree</span></div>
+    <div class="content-box">
+      <div class="education-tree">
+        .
+        {{#education}}
+        <div class="education-item" data-item-index="{{index}}">
+          <span class="tree-branch">├──</span> <strong><span data-field="education.{{index}}.degree">{{degree}}</span></strong> <span data-field="education.{{index}}.institution">{{institution}}</span> <span class="education-year"><span data-field="education.{{index}}.year">{{year}}</span></span>
+        </div>
+        {{/education}}
+      </div>
+    </div>
+  </div>
+
+  <!-- Languages Section -->
+  <div class="cv-section">
+    <div class="section-title">~/cv/langues: <span class="command">cat langues.txt</span></div>
+    <div class="content-box">
+      {{#languages}}
+      <div class="language-item" data-item-index="{{index}}">
+        🌐 <strong><span data-field="languages.{{index}}.name">{{name}}</span></strong> : <span data-field="languages.{{index}}.level">{{level}}</span>
+      </div>
+      {{/languages}}
+    </div>
+  </div>
+
+  <!-- Footer Section -->
+  <div class="cv-section">
+    <div class="section-title">~/cv: <span class="command">cat signature.txt</span></div>
+    <div class="content-box">
+      <div class="footer-content">
+        {{#footer.website}}
+        <span data-field="footer.website">{{footer.website}}</span>
+        {{/footer.website}}
+        {{#footer.github}}
+        <br><span data-field="footer.github">{{footer.github}}</span>
+        {{/footer.github}}
+      </div>
+    </div>
+  </div>
+</div>

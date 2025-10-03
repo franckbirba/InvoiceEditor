@@ -1,0 +1,210 @@
+:root {
+  /* Colors matching the Facture theme */
+  --color-bg: #ffffff;
+  --color-fg: #333333;
+  --color-box-bg: #f0f0f0;
+  --color-green: #6aaf50;
+  --color-red: #d32f2f;
+  --color-blue: #2980b9;
+  --color-orange: #e67e22;
+  --color-border: #333333;
+
+  /* Typography - Monospace */
+  --font-mono: 'Courier New', monospace;
+  --h1: 18pt;
+  --h2: 11pt;
+  --text: 10pt;
+
+  /* Layout */
+  --page-w: 794px;
+  --page-pad: 40px;
+  --gap: 15px;
+}
+
+/* CV Preview Container */
+.cv-preview {
+  max-width: var(--page-w);
+  margin: 0 auto;
+  padding: var(--page-pad);
+  background: white;
+  color: var(--color-fg);
+  font-family: var(--font-mono);
+  font-size: var(--text);
+  line-height: 1.5;
+}
+
+/* Header */
+.cv-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.double-separator {
+  border-top: 3px double var(--color-green);
+  margin: 10px 0;
+}
+
+.cv-title {
+  font-size: var(--h1);
+  font-weight: bold;
+  margin: 15px 0 5px 0;
+  color: var(--color-fg);
+  letter-spacing: 1px;
+}
+
+.cv-subtitle {
+  font-size: var(--h2);
+  color: var(--color-fg);
+  margin: 5px 0 15px 0;
+  letter-spacing: 0.5px;
+}
+
+/* Sections */
+.cv-section {
+  margin-bottom: 20px;
+  page-break-inside: avoid;
+}
+
+.section-title {
+  font-size: var(--text);
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+/* Prompt part in green */
+.section-title {
+  color: var(--color-green);
+}
+
+/* Command part in gray */
+span.command {
+  color: #666666 !important;
+  font-weight: normal !important;
+}
+
+.section-title span.command {
+  color: #666666 !important;
+  font-weight: normal !important;
+}
+
+.content-box {
+  background-color: var(--color-box-bg);
+  padding: 15px;
+  margin-bottom: 5px;
+}
+
+.section-content {
+  white-space: pre-line;
+  line-height: 1.6;
+}
+
+/* Contact */
+.contact-line {
+  margin-bottom: 2px;
+  line-height: 1.4;
+}
+
+/* Experience */
+.experience-item {
+  margin-bottom: 15px;
+}
+
+.experience-item:last-child {
+  margin-bottom: 0;
+}
+
+.experience-header {
+  margin-bottom: 5px;
+  line-height: 1.4;
+}
+
+.experience-period {
+  color: var(--color-red);
+  font-weight: bold;
+}
+
+.arrow {
+  color: var(--color-fg);
+}
+
+.experience-description {
+  margin-top: 5px;
+  margin-left: 0;
+  white-space: pre-line;
+  line-height: 1.5;
+}
+
+.experience-achievements {
+  margin-top: 5px;
+  margin-left: 0;
+  white-space: pre-line;
+  line-height: 1.5;
+}
+
+/* Skills */
+.skill-category {
+  margin-bottom: 8px;
+  line-height: 1.6;
+}
+
+.skill-items {
+  font-weight: normal;
+}
+
+.skill-item {
+  display: inline;
+}
+
+/* Education */
+.education-tree {
+  margin-left: 0;
+  line-height: 1.6;
+}
+
+.education-item {
+  margin-bottom: 3px;
+}
+
+.tree-branch {
+  color: var(--color-fg);
+  margin-right: 5px;
+}
+
+.education-year {
+  color: var(--color-red);
+  font-weight: bold;
+}
+
+/* Languages */
+.language-item {
+  margin-bottom: 5px;
+  line-height: 1.5;
+}
+
+/* Footer */
+.footer-content {
+  text-align: center;
+  line-height: 1.6;
+}
+
+.footer-content a {
+  color: var(--color-blue);
+  text-decoration: underline;
+}
+
+/* Print styles */
+@media print {
+  .cv-preview {
+    padding: 20px;
+    max-width: 100%;
+  }
+
+  .content-box {
+    break-inside: avoid;
+  }
+}
+
+@page {
+  margin: 15mm;
+  size: A4;
+}

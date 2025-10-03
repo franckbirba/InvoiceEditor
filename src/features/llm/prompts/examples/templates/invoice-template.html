@@ -1,0 +1,96 @@
+<div class="invoice-preview" id="invoice-content">
+  <div class="invoice-header">
+    <div class="invoice-title">FACTURE</div>
+    <div class="header-separator"></div>
+    <div class="invoice-meta">
+      <div><strong>N°</strong> <span data-field="invoice.number">{{invoice.number}}</span></div>
+      <div style="font-size: 14px; color: #666;"><span data-field="sender.name">{{sender.name}}</span></div>
+      <div><strong>DATE:</strong> <span data-field="invoice.date">{{formatted.date}}</span></div>
+    </div>
+    <div class="header-separator"></div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0;">
+    <div>
+      <div class="section-title">Émetteur</div>
+      <div class="info-box" style="margin-bottom: 0;">
+        <strong><span data-field="sender.name">{{sender.name}}</span></strong><br>
+        {{#sender.address}}<span data-field="sender.address">{{sender.address}}</span><br>{{/sender.address}}
+        {{#sender.email}}📧 <span data-field="sender.email">{{sender.email}}</span><br>{{/sender.email}}
+        {{#sender.phone}}📱 <span data-field="sender.phone">{{sender.phone}}</span><br>{{/sender.phone}}
+        {{#sender.bank}}<span data-field="sender.bank">{{sender.bank}}</span><br>{{/sender.bank}}
+        {{#sender.notes}}<em><span data-field="sender.notes">{{sender.notes}}</span></em>{{/sender.notes}}
+      </div>
+    </div>
+    <div>
+      <div class="section-title">Client</div>
+      <div class="info-box" style="margin-bottom: 0;">
+        <strong><span data-field="client.name">{{client.name}}</span></strong><br>
+        {{#client.address}}<span data-field="client.address">{{client.address}}</span><br>{{/client.address}}
+        {{#client.email}}📧 <span data-field="client.email">{{client.email}}</span><br>{{/client.email}}
+        {{#client.phone}}📱 <span data-field="client.phone">{{client.phone}}</span><br>{{/client.phone}}
+        {{#client.bank}}<span data-field="client.bank">{{client.bank}}</span><br>{{/client.bank}}
+        {{#client.reg}}<span data-field="client.reg">{{client.reg}}</span><br>{{/client.reg}}
+        {{#client.notes}}<em><span data-field="client.notes">{{client.notes}}</span></em>{{/client.notes}}
+      </div>
+    </div>
+  </div>
+
+  {{#invoice.subject}}
+  <div class="section-title" style="margin-top: 8px;">Objet</div>
+  <div class="highlight-box"><span data-field="invoice.subject">{{invoice.subject}}</span></div>
+  {{/invoice.subject}}
+
+  <div class="section-title">Prestations</div>
+  <div class="table-wrapper">
+    <table class="invoice-table">
+      <thead>
+        <tr>
+          <th>DÉSIGNATION</th>
+          <th style="text-align: center;">QTÉ</th>
+          <th style="text-align: right;">P.U.</th>
+          <th style="text-align: right;">REMISE</th>
+          <th style="text-align: right;">TOTAL</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#items_with_totals}}
+        <tr data-item-index="{{index}}">
+          <td><span data-field="items.{{index}}.description">{{description}}</span></td>
+          <td style="text-align: center;"><span data-field="items.{{index}}.qty">{{qty_formatted}}</span></td>
+          <td class="text-right"><span data-field="items.{{index}}.unit_price">{{unit_price_formatted}}</span></td>
+          <td class="text-right"><span data-field="items.{{index}}.discount">{{discount}}</span>%</td>
+          <td class="text-right"><strong>{{line_total_formatted}}</strong></td>
+        </tr>
+        {{/items_with_totals}}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-title">Récapitulatif</div>
+  <div class="summary-section">
+    <div class="summary-row">
+      <span>Sous-total:</span>
+      <span>{{formatted.subtotal}}</span>
+    </div>
+    {{#totals.taxes}}
+    <div class="summary-row" data-tax-index="{{index}}">
+      <span><span data-field="summary.taxes.{{index}}.label">{{label}}</span> (<span data-field="summary.taxes.{{index}}.rate">{{rate}}</span>%):</span>
+      <span>{{amount}}</span>
+    </div>
+    {{/totals.taxes}}
+    <div class="summary-row total">
+      <span>TOTAL</span>
+      <span>{{formatted.total}}</span>
+    </div>
+  </div>
+
+  {{#invoice.payment_terms}}
+  <div class="section-title">Conditions de paiement</div>
+  <div class="highlight-box"><span data-field="invoice.payment_terms">{{invoice.payment_terms}}</span></div>
+  {{/invoice.payment_terms}}
+
+  <div class="footer-section">
+    {{#footer.legal}}<span data-field="footer.legal">{{footer.legal}}</span>{{/footer.legal}}
+  </div>
+</div>

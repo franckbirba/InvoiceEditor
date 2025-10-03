@@ -1,0 +1,183 @@
+schema_name: "DocumentType"
+purpose: "Define the structure and fields for a type of document"
+
+required_fields:
+  id:
+    type: string
+    format: "kebab-case"
+    description: "Unique identifier for the document type"
+    example: "legal-contract"
+
+  name:
+    type: string
+    description: "Human-readable display name"
+    example: "Legal Contract"
+
+  icon:
+    type: string
+    optional: true
+    description: "Lucide icon name (see https://lucide.dev)"
+    examples: ["FileText", "User", "Mail", "Briefcase", "FileCheck"]
+
+  description:
+    type: string
+    optional: true
+    description: "Brief description of the document type"
+
+  sections:
+    type: array
+    description: "Array of section objects defining the document structure"
+    min_items: 1
+
+  createdAt:
+    type: number
+    description: "Timestamp (use Date.now())"
+
+  updatedAt:
+    type: number
+    description: "Timestamp (use Date.now())"
+
+section_structure:
+  id:
+    type: string
+    format: "lowercase"
+    description: "Section identifier"
+
+  name:
+    type: string
+    description: "Section display name"
+
+  fields:
+    type: array
+    description: "Array of field definitions"
+    min_items: 1
+
+field_types:
+  simple_fields:
+    text:
+      use_for: "Single line text input"
+      example: "Name, Title, Subject"
+
+    textarea:
+      use_for: "Multi-line text input"
+      example: "Description, Notes, Address"
+
+    email:
+      use_for: "Email addresses"
+      example: "Contact email"
+
+    tel:
+      use_for: "Phone numbers"
+      example: "Phone contact"
+
+    url:
+      use_for: "Web URLs"
+      example: "Website, LinkedIn"
+
+    number:
+      use_for: "Numeric values"
+      example: "Quantity, Price, Amount"
+
+    date:
+      use_for: "Date selection"
+      example: "Invoice date, Birth date"
+
+  complex_fields:
+    array:
+      use_for: "Repeatable items (invoices, experience, education)"
+      requires: "itemSchema property with array of field definitions"
+      example: |
+        {
+          "id": "items",
+          "name": "Line Items",
+          "type": "array",
+          "required": false,
+          "itemSchema": [
+            {"id": "description", "name": "Description", "type": "text", "required": true},
+            {"id": "quantity", "name": "Quantity", "type": "number", "required": true}
+          ]
+        }
+
+field_properties:
+  id:
+    type: string
+    required: true
+    format: "snake_case or camelCase"
+
+  name:
+    type: string
+    required: true
+    description: "Display label"
+
+  type:
+    type: string
+    required: true
+    enum: ["text", "textarea", "email", "tel", "url", "number", "date", "array"]
+
+  required:
+    type: boolean
+    optional: true
+    default: false
+
+  placeholder:
+    type: string
+    optional: true
+    description: "Placeholder text for input"
+
+  defaultValue:
+    type: any
+    optional: true
+    description: "Default value for the field"
+
+  itemSchema:
+    type: array
+    required_when: "type is 'array'"
+    description: "Schema for array items"
+
+best_practices:
+  - "Group related fields into logical sections"
+  - "Use descriptive names that users will understand"
+  - "Mark only truly essential fields as required"
+  - "Provide helpful placeholders for guidance"
+  - "Use appropriate field types for data validation"
+  - "For arrays, keep itemSchema focused and simple"
+  - "Include common fields like dates, names, descriptions"
+
+common_patterns:
+  invoice_pattern:
+    sections:
+      - "sender (emitter info)"
+      - "client (recipient info)"
+      - "invoice (number, date, terms)"
+      - "items (line items array)"
+      - "summary (totals, taxes)"
+      - "footer (notes, signature)"
+
+  resume_pattern:
+    sections:
+      - "personal (name, contact)"
+      - "summary (professional summary)"
+      - "experience (work history array)"
+      - "education (education array)"
+      - "skills (skills array)"
+      - "languages (languages array)"
+
+  contract_pattern:
+    sections:
+      - "parties (contracting parties)"
+      - "terms (contract terms)"
+      - "clauses (legal clauses)"
+      - "signatures (signature fields)"
+
+examples_reference:
+  - path: "examples/document-types/invoice.json"
+    description: "Complete invoice document type"
+
+  - path: "examples/document-types/cv.json"
+    description: "Complete CV/resume document type"
+
+  - path: "examples/document-types/contract.json"
+    description: "Contract document type"
+
+  - path: "examples/document-types/letter.json"
+    description: "Business letter document type"

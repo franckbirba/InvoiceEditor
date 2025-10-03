@@ -1,0 +1,103 @@
+{
+  "id": "cv",
+  "name": "CV",
+  "icon": "User",
+  "description": "Curriculum Vitae professionnel",
+  "sections": [
+    {
+      "id": "personal",
+      "name": "Informations personnelles",
+      "fields": [
+        { "id": "name", "name": "Nom complet", "type": "text", "required": true },
+        { "id": "title", "name": "Titre/Poste", "type": "text", "required": false },
+        { "id": "email", "name": "Email", "type": "email", "required": false },
+        { "id": "phone", "name": "Téléphone", "type": "tel", "required": false },
+        { "id": "address", "name": "Adresse", "type": "textarea", "required": false },
+        { "id": "website", "name": "Site web", "type": "url", "required": false },
+        { "id": "linkedin", "name": "LinkedIn", "type": "url", "required": false },
+        { "id": "github", "name": "GitHub", "type": "url", "required": false }
+      ]
+    },
+    {
+      "id": "summary",
+      "name": "Résumé professionnel",
+      "fields": [
+        { "id": "summary", "name": "Résumé", "type": "textarea", "required": false }
+      ]
+    },
+    {
+      "id": "experience",
+      "name": "Expérience professionnelle",
+      "fields": [
+        {
+          "id": "experiences",
+          "name": "Expériences",
+          "type": "array",
+          "required": false,
+          "itemSchema": [
+            { "id": "position", "name": "Poste", "type": "text", "required": true },
+            { "id": "company", "name": "Entreprise", "type": "text", "required": true },
+            { "id": "location", "name": "Lieu", "type": "text", "required": false },
+            { "id": "start_date", "name": "Date début", "type": "date", "required": false },
+            { "id": "end_date", "name": "Date fin", "type": "date", "required": false },
+            { "id": "current", "name": "Poste actuel", "type": "text", "required": false },
+            { "id": "description", "name": "Description", "type": "textarea", "required": false }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "education",
+      "name": "Formation",
+      "fields": [
+        {
+          "id": "education",
+          "name": "Formations",
+          "type": "array",
+          "required": false,
+          "itemSchema": [
+            { "id": "degree", "name": "Diplôme", "type": "text", "required": true },
+            { "id": "school", "name": "École", "type": "text", "required": true },
+            { "id": "location", "name": "Lieu", "type": "text", "required": false },
+            { "id": "year", "name": "Année", "type": "text", "required": false },
+            { "id": "description", "name": "Description", "type": "textarea", "required": false }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "skills",
+      "name": "Compétences",
+      "fields": [
+        {
+          "id": "skills",
+          "name": "Compétences par catégorie",
+          "type": "array",
+          "required": false,
+          "itemSchema": [
+            { "id": "category", "name": "Catégorie", "type": "text", "required": true },
+            { "id": "items", "name": "Compétences (séparées par virgules, utilisez * pour importance)", "type": "text", "required": true }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "languages",
+      "name": "Langues",
+      "fields": [
+        {
+          "id": "languages",
+          "name": "Langues",
+          "type": "array",
+          "required": false,
+          "itemSchema": [
+            { "id": "language", "name": "Langue", "type": "text", "required": true },
+            { "id": "level", "name": "Niveau", "type": "text", "required": true }
+          ]
+        }
+      ]
+    }
+  ],
+  "createdAt": 0,
+  "updatedAt": 0
+}
