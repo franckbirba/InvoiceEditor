@@ -40,7 +40,7 @@ export function enrichInvoiceData(data: InvoiceData): TemplateData {
   // Format tax amounts
   const formattedTaxes = totals.taxes.map(tax => ({
     ...tax,
-    amount: formatCurrency(tax.amount, currency, locale),
+    amount: formatCurrency(tax.amount, currency, locale) as any,
   }));
 
   return {

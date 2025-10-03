@@ -13,7 +13,8 @@ import sampleData from './sample-data.json';
 type ActiveView =
   | { type: 'document'; id: string }
   | { type: 'template'; id: string; mode: 'preview' | 'edit' }
-  | { type: 'theme'; id: string; mode: 'preview' | 'edit' };
+  | { type: 'theme'; id: string; mode: 'preview' | 'edit' }
+  | { type: 'documentType'; id: string; mode: 'edit' };
 
 interface InvoiceStore {
   data: InvoiceData;

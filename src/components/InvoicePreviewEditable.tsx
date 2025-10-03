@@ -51,7 +51,7 @@ export function InvoicePreviewEditable() {
   const { data, template, theme, updateData } = useInvoiceStore();
   const [renderedHtml, setRenderedHtml] = React.useState('');
   const contentRef = React.useRef<HTMLDivElement>(null);
-  const updateTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+  const updateTimeoutRef = React.useRef<number | null>(null);
   const activeFieldsRef = React.useRef<Set<string>>(new Set());
   const initialDataRef = React.useRef(data);
 
@@ -585,14 +585,6 @@ export function InvoicePreviewEditable() {
       input.style.position = 'absolute';
       input.style.left = `${rect.left - containerRect.left}px`;
       input.style.top = `${rect.top - containerRect.top}px`;
-      input.style.width = `${Math.max(rect.width, 150)}px`;
-      input.style.padding = '4px 8px';
-      input.style.fontSize = 'inherit';
-      input.style.fontFamily = 'inherit';
-      input.style.border = '2px solid rgb(59, 130, 246)';
-      input.style.borderRadius = '4px';
-      input.style.backgroundColor = 'white';
-      input.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
       input.style.zIndex = '1000';
 
       // Add to container
@@ -1013,7 +1005,7 @@ export function InvoicePreviewEditable() {
         if (spans.length > 0) {
           const lastSpan = spans[spans.length - 1];
           if (lastSpan && !lastSpan.hasAttribute('data-field')) {
-            lastSpan.textContent = tax.amount;
+            lastSpan.textContent = String(tax.amount);
           }
         }
       });

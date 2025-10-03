@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useInvoiceStore } from './features/invoice/useInvoiceStore';
 import { Topbar } from './components/Topbar';
 import { ProjectSidebar } from './components/ProjectSidebar';
@@ -7,14 +7,17 @@ import { InvoicePreviewEditable } from './components/InvoicePreviewEditable';
 import { TemplateEditor } from './components/TemplateEditor';
 import { TemplateThemeEditor } from './components/TemplateThemeEditor';
 import { TemplateThemePreview } from './components/TemplateThemePreview';
-import { ToastProvider } from './components/Toast';
+import { DocumentTypeEditor, type DocumentTypeEditorRef } from './components/DocumentTypeEditor';
+import { ToastProvider, useToast } from './components/Toast';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { initializeDocumentSystem } from './features/document/initialize';
+import { initializeDocumentTypes } from './features/document/initialize-document-types';
 import './lib/i18n';
 
 const SIDEBAR_OPEN_KEY = 'document-studio-sidebar-open';
 
-function App() {
+function AppContent() {
+  const { showToast } = useToast();
   const isEditorMode = useInvoiceStore((state) => state.isEditorMode);
   const isInlineEditMode = useInvoiceStore((state) => state.isInlineEditMode);
   const activeView = useInvoiceStore((state) => state.activeView);
@@ -24,9 +27,11 @@ function App() {
     const saved = localStorage.getItem(SIDEBAR_OPEN_KEY);
     return saved ? JSON.parse(saved) : true;
   });
+  const documentTypeEditorRef = useRef<DocumentTypeEditorRef | null>(null);
 
   // Initialize document system on first load
   useEffect(() => {
+    initializeDocumentTypes();
     const result = initializeDocumentSystem();
     if (result.migrated) {
       console.log(`Migrated ${result.documentCount} documents to new format`);
@@ -74,13 +79,14 @@ function App() {
 
 
   return (
-    <ErrorBoundary>
-      <ToastProvider>
-        <div className="h-screen bg-gray-50 flex flex-col">
-          <Topbar
-            viewingItem={activeView && (activeView.type === 'template' || activeView.type === 'theme') ? activeView : null}
-            onEditItem={toggleViewMode}
-          />
+    <div className="h-screen bg-gray-50 flex flex-col">
+      <Topbar
+        viewingItem={activeView && (activeView.type === 'template' || activeView.type === 'theme' || activeView.type === 'documentType') ? activeView : null}
+        onEditItem={toggleViewMode}
+        documentTypeEditorRef={documentTypeEditorRef as React.RefObject<DocumentTypeEditorRef>}
+        onDocumentTypeSave={() => showToast('success', 'Sauvegardé', 'Le type de document a été sauvegardé')}
+        onDocumentTypeError={(error) => showToast('error', 'Erreur', error)}
+      />
 
           <div className="flex-1 flex overflow-hidden min-h-0">
             {/* Project Sidebar */}
@@ -89,6 +95,7 @@ function App() {
               onToggle={() => setSidebarOpen(!sidebarOpen)}
               onEditTemplate={(id) => setActiveView({ type: 'template', id, mode: 'preview' })}
               onEditTheme={(id) => setActiveView({ type: 'theme', id, mode: 'preview' })}
+              onEditDocumentType={(id) => setActiveView({ type: 'documentType', id, mode: 'edit' })}
             />
 
             {/* Main Content */}
@@ -117,6 +124,13 @@ function App() {
                     id={activeView.id}
                   />
                 )
+              ) : activeView?.type === 'documentType' ? (
+                <DocumentTypeEditor
+                  ref={documentTypeEditorRef}
+                  id={activeView.id}
+                  onSave={() => showToast('success', 'Sauvegardé', 'Le type de document a été sauvegardé')}
+                  onError={(error) => showToast('error', 'Erreur', error)}
+                />
               ) : isEditorMode ? (
                 <TemplateEditor />
               ) : isInlineEditMode ? (
@@ -127,6 +141,14 @@ function App() {
             </main>
           </div>
         </div>
+  );
+}
+
+function App() {
+  return (
+    <ErrorBoundary>
+      <ToastProvider>
+        <AppContent />
       </ToastProvider>
     </ErrorBoundary>
   );

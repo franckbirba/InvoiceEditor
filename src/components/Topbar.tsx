@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
-import { FileText, Printer, Eye, User, Pencil, FileCode, Palette, Edit, Trash2, Plus, Copy, Code } from 'lucide-react';
+import { FileText, Printer, Eye, User, Pencil, FileCode, Palette, Edit, Trash2, Plus, Copy, Code, Database, Save, FileType } from 'lucide-react';
 import { useInvoiceStore } from '../features/invoice/useInvoiceStore';
 import { printInvoice } from '../lib/print';
 import { JsonImportExport } from './JsonImportExport';
@@ -10,18 +10,23 @@ import { TemplateSelector } from './TemplateSelector';
 import { DocumentsNavigationDialog } from './DocumentsNavigationDialog';
 import { useToast } from './Toast';
 import { getDocumentTypes, getDocument, getTemplate, getTheme } from '../features/document/document.storage';
+import { getDocumentType, duplicateDocumentType, renameDocumentType, deleteDocumentType } from '../features/document/document-type-storage';
 import type { Document } from '../features/document/document.schema';
+import type { DocumentTypeEditorRef } from './DocumentTypeEditor';
 
 interface TopbarProps {
   viewingItem?: {
-    type: 'template' | 'theme';
+    type: 'template' | 'theme' | 'documentType';
     id: string;
     mode: 'preview' | 'edit';
   } | null;
   onEditItem?: () => void;
+  documentTypeEditorRef?: React.RefObject<DocumentTypeEditorRef>;
+  onDocumentTypeSave?: () => void;
+  onDocumentTypeError?: (error: string) => void;
 }
 
-export function Topbar({ viewingItem, onEditItem }: TopbarProps) {
+export function Topbar({ viewingItem, onEditItem, documentTypeEditorRef }: TopbarProps) {
   const { t } = useTranslation('ui');
   const { showToast } = useToast();
   const { isEditorMode, toggleEditorMode, activeDocumentId, isInlineEditMode, toggleInlineEditMode, renameTemplate, duplicateTemplate, deleteTemplate, renameTheme, duplicateTheme, deleteTheme, setTemplateById, setThemeById, createDocument } = useInvoiceStore();
@@ -87,19 +92,30 @@ export function Topbar({ viewingItem, onEditItem }: TopbarProps) {
     }
   };
 
-  // Contextual actions for templates/themes
+  // Contextual actions for templates/themes/documentTypes
   const handleRename = () => {
     if (!viewingItem) return;
-    
-    const item = viewingItem.type === 'template' ? getTemplate(viewingItem.id) : getTheme(viewingItem.id);
+
+    const item = viewingItem.type === 'template'
+      ? getTemplate(viewingItem.id)
+      : viewingItem.type === 'theme'
+      ? getTheme(viewingItem.id)
+      : getDocumentType(viewingItem.id);
     if (!item) return;
-    
+
+    if (viewingItem.type === 'documentType' && 'isBuiltIn' in item && item.isBuiltIn) {
+      showToast('error', 'Impossible', 'Impossible de renommer un type intégré');
+      return;
+    }
+
     const newName = prompt('Nouveau nom:', item.name);
     if (newName && newName.trim() && newName !== item.name) {
       if (viewingItem.type === 'template') {
         renameTemplate(viewingItem.id, newName.trim());
-      } else {
+      } else if (viewingItem.type === 'theme') {
         renameTheme(viewingItem.id, newName.trim());
+      } else {
+        renameDocumentType(viewingItem.id, newName.trim());
       }
       showToast('success', 'Renommé', `"${newName.trim()}" a été renommé`);
     }
@@ -110,8 +126,10 @@ export function Topbar({ viewingItem, onEditItem }: TopbarProps) {
 
     if (viewingItem.type === 'template') {
       duplicateTemplate(viewingItem.id);
-    } else {
+    } else if (viewingItem.type === 'theme') {
       duplicateTheme(viewingItem.id);
+    } else {
+      duplicateDocumentType(viewingItem.id);
     }
     showToast('success', 'Dupliqué', 'Une copie a été créée');
   };
@@ -119,19 +137,30 @@ export function Topbar({ viewingItem, onEditItem }: TopbarProps) {
   const handleDelete = () => {
     if (!viewingItem) return;
 
-    const item = viewingItem.type === 'template' ? getTemplate(viewingItem.id) : getTheme(viewingItem.id);
+    const item = viewingItem.type === 'template'
+      ? getTemplate(viewingItem.id)
+      : viewingItem.type === 'theme'
+      ? getTheme(viewingItem.id)
+      : getDocumentType(viewingItem.id);
     if (!item) return;
 
-    if (item.isDefault) {
+    if (viewingItem.type !== 'documentType' && 'isDefault' in item && item.isDefault) {
       showToast('error', 'Impossible', 'Impossible de supprimer un élément par défaut');
+      return;
+    }
+
+    if (viewingItem.type === 'documentType' && 'isBuiltIn' in item && item.isBuiltIn) {
+      showToast('error', 'Impossible', 'Impossible de supprimer un type intégré');
       return;
     }
 
     if (confirm(`Supprimer "${item.name}" ?`)) {
       if (viewingItem.type === 'template') {
         deleteTemplate(viewingItem.id);
-      } else {
+      } else if (viewingItem.type === 'theme') {
         deleteTheme(viewingItem.id);
+      } else {
+        deleteDocumentType(viewingItem.id);
       }
       showToast('success', 'Supprimé', `"${item.name}" a été supprimé`);
 
@@ -165,19 +194,35 @@ export function Topbar({ viewingItem, onEditItem }: TopbarProps) {
           <div className="flex items-center gap-3">
             {viewingItem ? (
               <>
-                <div className={`p-2 rounded-lg ${viewingItem.type === 'template' ? 'bg-purple-600' : 'bg-pink-600'}`}>
+                <div className={`p-2 rounded-lg ${
+                  viewingItem.type === 'template'
+                    ? 'bg-purple-600'
+                    : viewingItem.type === 'theme'
+                    ? 'bg-pink-600'
+                    : 'bg-indigo-600'
+                }`}>
                   {viewingItem.type === 'template' ? (
                     <FileCode className="w-5 h-5 text-white" />
-                  ) : (
+                  ) : viewingItem.type === 'theme' ? (
                     <Palette className="w-5 h-5 text-white" />
+                  ) : (
+                    <Database className="w-5 h-5 text-white" />
                   )}
                 </div>
                 <div>
                   <h1 className="text-xl font-bold text-gray-900">
-                    {viewingItem.type === 'template' ? getTemplate(viewingItem.id)?.name : getTheme(viewingItem.id)?.name}
+                    {viewingItem.type === 'template'
+                      ? getTemplate(viewingItem.id)?.name
+                      : viewingItem.type === 'theme'
+                      ? getTheme(viewingItem.id)?.name
+                      : getDocumentType(viewingItem.id)?.name}
                   </h1>
                   <p className="text-xs text-gray-500">
-                    {viewingItem.type === 'template' ? 'Template' : 'Thème'} • {viewingItem.mode === 'preview' ? 'Aperçu' : 'Édition'}
+                    {viewingItem.type === 'template'
+                      ? 'Template'
+                      : viewingItem.type === 'theme'
+                      ? 'Thème'
+                      : 'Type de document'} • {viewingItem.mode === 'preview' ? 'Aperçu' : 'Édition'}
                   </p>
                 </div>
               </>
@@ -197,16 +242,18 @@ export function Topbar({ viewingItem, onEditItem }: TopbarProps) {
           {/* Center: Actions */}
           <div className="flex items-center gap-2">
             {viewingItem ? (
-              // Contextual actions for templates/themes
+              // Contextual actions for templates/themes/documentTypes
               <>
-                <button
-                  onClick={handleCreateDocument}
-                  className="flex items-center gap-2 px-3 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                  title="Créer un document"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span className="hidden sm:inline">Créer un document</span>
-                </button>
+                {viewingItem.type !== 'documentType' && (
+                  <button
+                    onClick={handleCreateDocument}
+                    className="flex items-center gap-2 px-3 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                    title="Créer un document"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span className="hidden sm:inline">Créer un document</span>
+                  </button>
+                )}
 
                 <button
                   onClick={handleRename}
@@ -226,40 +273,87 @@ export function Topbar({ viewingItem, onEditItem }: TopbarProps) {
                   <span className="hidden sm:inline">Dupliquer</span>
                 </button>
 
-                {!getTemplate(viewingItem.id)?.isDefault && !getTheme(viewingItem.id)?.isDefault && (
-                  <button
-                    onClick={handleDelete}
-                    className="flex items-center gap-2 px-3 py-2 text-sm border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors"
-                    title="Supprimer"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                    <span className="hidden sm:inline">Supprimer</span>
-                  </button>
-                )}
+                {(() => {
+                  const item = viewingItem.type === 'template'
+                    ? getTemplate(viewingItem.id)
+                    : viewingItem.type === 'theme'
+                    ? getTheme(viewingItem.id)
+                    : getDocumentType(viewingItem.id);
+                  const canDelete = item && !('isDefault' in item && item.isDefault) && !('isBuiltIn' in item && item.isBuiltIn);
 
-                <div className="w-px h-8 bg-gray-300 mx-2" />
+                  return canDelete ? (
+                    <button
+                      onClick={handleDelete}
+                      className="flex items-center gap-2 px-3 py-2 text-sm border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors"
+                      title="Supprimer"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      <span className="hidden sm:inline">Supprimer</span>
+                    </button>
+                  ) : null;
+                })()}
 
-                <button
-                  onClick={() => onEditItem?.()}
-                  className={`flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors ${
-                    viewingItem.mode === 'preview'
-                      ? 'bg-blue-600 text-white hover:bg-blue-700'
-                      : 'border border-gray-300 hover:bg-gray-50'
-                  }`}
-                  title={viewingItem.mode === 'preview' ? 'Éditer le code' : 'Retour au preview'}
-                >
-                  {viewingItem.mode === 'preview' ? (
-                    <>
-                      <Code className="w-4 h-4" />
-                      <span className="hidden sm:inline">Éditer</span>
-                    </>
-                  ) : (
-                    <>
+                {viewingItem.type === 'documentType' ? (
+                  <>
+                    <div className="w-px h-8 bg-gray-300 mx-2" />
+
+                    <button
+                      onClick={() => documentTypeEditorRef?.current?.format()}
+                      className="flex items-center gap-2 px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                      title="Formater le JSON"
+                    >
+                      <FileType className="w-4 h-4" />
+                      <span className="hidden sm:inline">Formater</span>
+                    </button>
+
+                    <button
+                      onClick={() => documentTypeEditorRef?.current?.togglePreview()}
+                      className="flex items-center gap-2 px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                      title="Basculer l'aperçu"
+                    >
                       <Eye className="w-4 h-4" />
                       <span className="hidden sm:inline">Aperçu</span>
-                    </>
-                  )}
-                </button>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        documentTypeEditorRef?.current?.save();
+                      }}
+                      disabled={getDocumentType(viewingItem.id)?.isBuiltIn}
+                      className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      title="Sauvegarder"
+                    >
+                      <Save className="w-4 h-4" />
+                      <span className="hidden sm:inline">Sauvegarder</span>
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <div className="w-px h-8 bg-gray-300 mx-2" />
+
+                    <button
+                      onClick={() => onEditItem?.()}
+                      className={`flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors ${
+                        viewingItem.mode === 'preview'
+                          ? 'bg-blue-600 text-white hover:bg-blue-700'
+                          : 'border border-gray-300 hover:bg-gray-50'
+                      }`}
+                      title={viewingItem.mode === 'preview' ? 'Éditer le code' : 'Retour au preview'}
+                    >
+                      {viewingItem.mode === 'preview' ? (
+                        <>
+                          <Code className="w-4 h-4" />
+                          <span className="hidden sm:inline">Éditer</span>
+                        </>
+                      ) : (
+                        <>
+                          <Eye className="w-4 h-4" />
+                          <span className="hidden sm:inline">Aperçu</span>
+                        </>
+                      )}
+                    </button>
+                  </>
+                )}
               </>
             ) : (
               // Default document actions
@@ -313,12 +407,12 @@ export function Topbar({ viewingItem, onEditItem }: TopbarProps) {
           {/* Right: Settings */}
           <div className="flex items-center gap-3">
             {viewingItem ? (
-              // Show theme selector for templates, template selector for themes
+              // Show theme selector for templates, template selector for themes, nothing for documentTypes
               viewingItem.type === 'template' ? (
                 <ThemeSwitcher />
-              ) : (
+              ) : viewingItem.type === 'theme' ? (
                 <TemplateSelector />
-              )
+              ) : null
             ) : (
               // For documents, always reserve space for selectors to prevent layout shift
               <>

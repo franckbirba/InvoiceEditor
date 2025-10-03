@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { FileText, User, ChevronLeft, FolderPlus, FilePlus, Move, Copy, Trash2, Palette, FileCode, Edit } from 'lucide-react';
+import { FileText, User, ChevronLeft, FolderPlus, FilePlus, Move, Copy, Trash2, Palette, FileCode, Edit, Database, Plus } from 'lucide-react';
 import { ProjectTreeView } from './ProjectTreeView';
 import { CreateProjectDialog } from './CreateProjectDialog';
 import { MoveItemDialog } from './MoveItemDialog';
@@ -26,22 +26,25 @@ import {
 } from '../features/document/document.storage';
 import type { Document, Project, Template, Theme } from '../features/document/document.schema';
 import { useInvoiceStore } from '../features/invoice/useInvoiceStore';
+import { loadDocumentTypes, deleteDocumentType, duplicateDocumentType, renameDocumentType, saveDocumentType, type StoredDocumentType } from '../features/document/document-type-storage';
 
 interface ProjectSidebarProps {
   isOpen: boolean;
   onToggle: () => void;
   onEditTemplate: (id: string) => void;
   onEditTheme: (id: string) => void;
+  onEditDocumentType?: (id: string) => void;
 }
 
-type SidebarTab = 'explorer' | 'templates' | 'themes';
+type SidebarTab = 'explorer' | 'templates' | 'themes' | 'types';
 
-export function ProjectSidebar({ isOpen, onToggle, onEditTemplate, onEditTheme }: ProjectSidebarProps) {
+export function ProjectSidebar({ isOpen, onToggle, onEditTemplate, onEditTheme, onEditDocumentType }: ProjectSidebarProps) {
   const [activeTab, setActiveTab] = React.useState<SidebarTab>('explorer');
   const [projects, setProjects] = React.useState<Project[]>([]);
   const [documents, setDocuments] = React.useState<Document[]>([]);
   const [templates, setTemplates] = React.useState<Template[]>([]);
   const [themes, setThemes] = React.useState<Theme[]>([]);
+  const [documentTypes, setDocumentTypes] = React.useState<StoredDocumentType[]>([]);
   const [showCreateProject, setShowCreateProject] = React.useState(false);
   const [createProjectParentId, setCreateProjectParentId] = React.useState<string | undefined>();
   const [moveDialog, setMoveDialog] = React.useState<{
@@ -51,7 +54,7 @@ export function ProjectSidebar({ isOpen, onToggle, onEditTemplate, onEditTheme }
     name: string;
   } | null>(null);
   const [contextMenu, setContextMenu] = React.useState<{
-    type: 'document' | 'template' | 'theme';
+    type: 'document' | 'template' | 'theme' | 'documentType';
     id: string;
     x: number;
     y: number;
@@ -73,6 +76,7 @@ export function ProjectSidebar({ isOpen, onToggle, onEditTemplate, onEditTheme }
     setDocuments(getDocuments());
     setTemplates(getTemplates());
     setThemes(getThemes());
+    setDocumentTypes(loadDocumentTypes());
   };
 
   const handleCreateSubfolder = (parentId: string) => {
@@ -224,15 +228,91 @@ export function ProjectSidebar({ isOpen, onToggle, onEditTemplate, onEditTheme }
   const handleDeleteTheme = (themeId: string) => {
     const theme = themes.find((t) => t.id === themeId);
     if (!theme) return;
-    
+
     if (theme.isDefault) {
       alert('Impossible de supprimer un thème par défaut');
       return;
     }
-    
+
     if (confirm(`Supprimer le thème "${theme.name}" ?`)) {
       deleteTheme(themeId);
       refreshData();
+    }
+  };
+
+  const handleRenameDocumentType = (typeId: string) => {
+    const docType = documentTypes.find((t) => t.id === typeId);
+    if (!docType || docType.isBuiltIn) return;
+
+    const newName = prompt('Nouveau nom du type:', docType.name);
+    if (newName && newName.trim() && newName !== docType.name) {
+      renameDocumentType(typeId, newName.trim());
+      refreshData();
+    }
+  };
+
+  const handleDuplicateDocumentType = (typeId: string) => {
+    duplicateDocumentType(typeId);
+    refreshData();
+  };
+
+  const handleDeleteDocumentType = (typeId: string) => {
+    const docType = documentTypes.find((t) => t.id === typeId);
+    if (!docType) return;
+
+    if (docType.isBuiltIn) {
+      alert('Impossible de supprimer un type intégré');
+      return;
+    }
+
+    if (confirm(`Supprimer le type "${docType.name}" ?`)) {
+      deleteDocumentType(typeId);
+      refreshData();
+    }
+  };
+
+  const handleCreateDocumentType = () => {
+    const name = prompt('Nom du nouveau type de document:');
+    if (!name || !name.trim()) return;
+
+    const typeId = prompt('ID du type (ex: contract, receipt):');
+    if (!typeId || !typeId.trim()) return;
+
+    // Create a minimal document type definition
+    const newDocType: StoredDocumentType = {
+      id: `custom-${typeId.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}`,
+      name: name.trim(),
+      definition: {
+        type: typeId.toLowerCase().replace(/\s+/g, '-'),
+        name: name.trim(),
+        description: `Type de document ${name.trim()}`,
+        sections: [
+          {
+            id: 'basic',
+            title: 'Informations de base',
+            fields: [
+              {
+                path: 'title',
+                label: 'Titre',
+                type: 'text',
+                editable: true,
+                required: true,
+              },
+            ],
+          },
+        ],
+      },
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      isBuiltIn: false,
+    };
+
+    saveDocumentType(newDocType);
+    refreshData();
+
+    // Open the newly created type for editing
+    if (onEditDocumentType) {
+      onEditDocumentType(newDocType.id);
     }
   };
 
@@ -307,6 +387,17 @@ export function ProjectSidebar({ isOpen, onToggle, onEditTemplate, onEditTheme }
             >
               <Palette className="w-3.5 h-3.5" />
               <span>Thèmes</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('types')}
+              className={`flex items-center gap-1.5 px-3 py-2 text-xs rounded-t transition-colors ${
+                activeTab === 'types'
+                  ? 'bg-gray-800 text-white'
+                  : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800/50'
+              }`}
+            >
+              <Database className="w-3.5 h-3.5" />
+              <span>Types</span>
             </button>
           </div>
         </div>
@@ -476,6 +567,56 @@ export function ProjectSidebar({ isOpen, onToggle, onEditTemplate, onEditTheme }
               )}
             </div>
           )}
+
+          {/* Types Tab */}
+          {activeTab === 'types' && (
+            <div className="flex-1 flex flex-col overflow-hidden">
+              {/* Add new type button */}
+              <div className="p-3 border-b border-gray-700">
+                <button
+                  onClick={handleCreateDocumentType}
+                  className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                >
+                  <Plus className="w-4 h-4" />
+                  Nouveau type
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-3 space-y-1">
+                {documentTypes.length === 0 ? (
+                  <div className="text-center text-gray-500 py-8 text-sm">
+                    Aucun type de document
+                  </div>
+                ) : (
+                  documentTypes.map((docType) => (
+                  <Tooltip key={docType.id} text={docType.name}>
+                    <button
+                      onClick={() => onEditDocumentType?.(docType.id)}
+                      onContextMenu={(e) => {
+                        e.preventDefault();
+                        setContextMenu({
+                          type: 'documentType',
+                          id: docType.id,
+                          x: e.clientX,
+                          y: e.clientY,
+                        });
+                      }}
+                      className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-gray-800 rounded transition-colors text-gray-300"
+                    >
+                      <Database className="w-4 h-4 text-purple-400 flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <div className="truncate">{docType.name}</div>
+                        <div className="text-xs text-gray-500 truncate">
+                          {docType.isBuiltIn ? 'Intégré' : 'Personnalisé'} • {docType.definition.type}
+                        </div>
+                      </div>
+                    </button>
+                  </Tooltip>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </ResizablePanel>
 
@@ -556,7 +697,8 @@ export function ProjectSidebar({ isOpen, onToggle, onEditTemplate, onEditTheme }
                     onClick: () => handleDeleteTemplate(contextMenu.id),
                   },
                 ]
-              : [
+              : contextMenu.type === 'theme'
+              ? [
                   {
                     label: 'Renommer',
                     icon: <Edit className="w-4 h-4" />,
@@ -573,6 +715,25 @@ export function ProjectSidebar({ isOpen, onToggle, onEditTemplate, onEditTheme }
                     icon: <Trash2 className="w-4 h-4" />,
                     variant: 'danger' as const,
                     onClick: () => handleDeleteTheme(contextMenu.id),
+                  },
+                ]
+              : [
+                  {
+                    label: 'Renommer',
+                    icon: <Edit className="w-4 h-4" />,
+                    onClick: () => handleRenameDocumentType(contextMenu.id),
+                  },
+                  {
+                    label: 'Dupliquer',
+                    icon: <Copy className="w-4 h-4" />,
+                    onClick: () => handleDuplicateDocumentType(contextMenu.id),
+                  },
+                  { separator: true, label: '', onClick: () => {} },
+                  {
+                    label: 'Supprimer',
+                    icon: <Trash2 className="w-4 h-4" />,
+                    variant: 'danger' as const,
+                    onClick: () => handleDeleteDocumentType(contextMenu.id),
                   },
                 ]
           }

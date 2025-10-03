@@ -147,7 +147,7 @@ export const fieldParsers: Record<FieldType, FieldParser> = {
   },
 
   currency: {
-    parse: (value, locale, context) => {
+    parse: (value, locale) => {
       // Extract just the number from formatted currency (e.g., "1 500 XOF" -> 1500)
       const cleaned = value
         .replace(/[A-Z]{3}/g, '') // Remove currency code
@@ -240,7 +240,7 @@ export const fieldParsers: Record<FieldType, FieldParser> = {
       const num = typeof value === 'number' ? value : parseFloat(value) || 0;
       return `${new Intl.NumberFormat(locale).format(num)}%`;
     },
-    validate: (value, field) => {
+    validate: (value) => {
       const num = typeof value === 'number' ? value : parseFloat(value);
       if (isNaN(num)) {
         return { valid: false, error: 'Must be a valid percentage' };
