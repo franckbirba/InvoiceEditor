@@ -100,9 +100,11 @@ When you receive a request to create a document type, template, or theme:
 
 ## 🔌 Integration Approaches
 
-### Option A: MCP Server (Model Context Protocol)
+### Option A: MCP Server (✅ IMPLEMENTED)
 
 Create an MCP server that exposes tools for document management.
+
+See `/mcp-server/` directory for full implementation and documentation.
 
 **Tools to implement:**
 - `create_document_type` - Generate DocumentType from description
@@ -165,23 +167,53 @@ app.post('/api/llm/create-type', async (req, res) => {
 });
 ```
 
-### Option C: Browser-Based (Local LLM)
+### Option C: Browser-Based API (✅ IMPLEMENTED)
 
-Use browser-side LLM APIs or WebLLM.
+Use the browser-based LLM service with Anthropic or OpenAI.
 
 **Implementation:**
 ```typescript
-import { LLMService } from './llm-service';
+import { useLLMService } from '@/features/llm';
 
-const llmService = new LLMService({
-  provider: 'chrome-ai', // or 'webllm'
-  systemPrompt: loadPromptSystem()
-});
+function MyComponent() {
+  const llm = useLLMService();
 
-const documentType = await llmService.createDocumentType(
-  "Create a legal contract document type"
-);
+  // Configure once
+  useEffect(() => {
+    if (!llm.isConfigured) {
+      llm.configure({
+        provider: 'anthropic', // or 'openai'
+        apiKey: 'your-api-key',
+        model: 'claude-3-5-sonnet-20241022' // optional
+      });
+    }
+  }, []);
+
+  // Create a document type
+  const handleCreate = async () => {
+    const result = await llm.createDocumentType(
+      "Create a legal contract document type with parties, terms, and signatures"
+    );
+
+    if (result.success) {
+      // Save to Document Studio
+      documentStore.addDocumentType(result.data);
+    } else {
+      console.error(result.error, result.issues);
+    }
+  };
+
+  return <button onClick={handleCreate}>Generate Document Type</button>;
+}
 ```
+
+**Features:**
+- ✅ React hook (`useLLMService`)
+- ✅ localStorage configuration
+- ✅ Automatic validation
+- ✅ Loading states
+- ✅ Error handling
+- ✅ Support for Anthropic Claude and OpenAI
 
 ## 🛠️ Validation Layer
 
@@ -381,12 +413,15 @@ const metrics = {
 - [x] YAML prompt system
 - [x] Example files
 - [x] Documentation
-- [ ] MCP server implementation
-- [ ] REST API implementation
-- [ ] Browser LLM integration
+- [x] MCP server implementation (see `/mcp-server/`)
+- [x] Browser-based LLM API (Anthropic/OpenAI)
+- [x] React hooks for easy integration
+- [x] Validation layer
 - [ ] Visual template editor with LLM assist
 - [ ] Template gallery with AI search
 - [ ] Multi-language support
+- [ ] Streaming responses
+- [ ] Cost tracking
 
 ## 📖 Additional Resources
 
