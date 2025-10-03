@@ -1,6 +1,8 @@
 export { ToastProvider, useToast } from './Toast';
 export { LanguageToggle } from './LanguageToggle';
 export { ThemeSwitcher } from './ThemeSwitcher';
+export { ThemeSelector } from './ThemeSelector';
+export { TemplateSelector } from './TemplateSelector';
 export { JsonImportExport } from './JsonImportExport';
 export { InvoicePreview } from './InvoicePreview';
 export { TemplateEditor } from './TemplateEditor';

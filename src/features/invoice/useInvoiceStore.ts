@@ -7,11 +7,13 @@ import {
   saveDocument,
   createNewDocument,
 } from '../../lib/storage';
+import { getTheme, getTemplate, renameTemplate, duplicateTemplate, deleteTemplate, renameTheme, duplicateTheme, deleteTheme } from '../document/document.storage';
 import sampleData from './sample-data.json';
 
 interface InvoiceStore {
   data: InvoiceData;
   template: string;
+  theme: string;
   isEditorMode: boolean;
   isInlineEditMode: boolean;
   dataVersion: number; // Incremented on external updates to trigger form reset
@@ -20,6 +22,15 @@ interface InvoiceStore {
   setData: (data: InvoiceData) => void;
   updateData: (updater: (data: InvoiceData) => InvoiceData) => void;
   setTemplate: (template: string) => void;
+  setTheme: (theme: string) => void;
+  setTemplateById: (templateId: string) => void;
+  setThemeById: (themeId: string) => void;
+  renameTemplate: (templateId: string, newName: string) => void;
+  duplicateTemplate: (templateId: string) => void;
+  deleteTemplate: (templateId: string) => void;
+  renameTheme: (themeId: string, newName: string) => void;
+  duplicateTheme: (themeId: string) => void;
+  deleteTheme: (themeId: string) => void;
   toggleEditorMode: () => void;
   toggleInlineEditMode: () => void;
   resetToSample: () => void;
@@ -29,6 +40,178 @@ interface InvoiceStore {
   loadDocumentById: (id: string) => void;
   createDocument: () => void;
 }
+
+// Default theme for invoices (using the original CV theme as base)
+const defaultInvoiceTheme = `:root {
+  /* Colors - CV Theme */
+  --color-bg: #f5f5f5;
+  --color-fg: #333333;
+  --color-muted: #666666;
+  --color-accent: #6aaf50;
+  --color-red: #d32f2f;
+  --color-border: #dddddd;
+  --color-box: #e8e8e8;
+  --chip-bg: #e8e8e8;
+  --chip-fg: #333333;
+
+  /* Typography - Monospace */
+  --font-mono: 'Courier New', monospace;
+  --h1: 24px;
+  --h2: 13px;
+  --text: 13px;
+  --mono: 13px;
+  --tracking: 2px;
+
+  /* Layout */
+  --page-w: 794px;
+  --page-pad: 32px;
+  --radius: 4px;
+  --gap: 16px;
+  --line: 1px;
+  --band: 1px;
+}
+
+/* Invoice Preview Styles */
+.invoice-preview {
+  max-width: var(--page-w);
+  margin: 0 auto;
+  padding: var(--page-pad);
+  background: white;
+  color: var(--color-fg);
+  font-family: var(--font-mono);
+  font-size: var(--text);
+  line-height: 1.8;
+}
+
+.invoice-header {
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.invoice-title {
+  font-size: var(--h1);
+  font-weight: bold;
+  letter-spacing: var(--tracking);
+  text-transform: uppercase;
+  margin: 0;
+  color: var(--color-fg);
+}
+
+.invoice-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: var(--h2);
+  color: var(--color-fg);
+  margin: 8px 0;
+}
+
+.invoice-meta strong {
+  color: var(--color-red);
+}
+
+.section-title {
+  color: var(--color-fg);
+  font-size: var(--h2);
+  margin: 0 0 6px 0;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.info-box {
+  padding: 12px;
+  margin-bottom: 12px;
+  font-size: var(--text);
+  line-height: 1.6;
+}
+
+.info-box strong {
+  color: var(--color-red);
+}
+
+.highlight-box {
+  padding: 10px 12px;
+  margin: 12px 0;
+  border-left: 2px solid var(--color-accent);
+  font-size: var(--text);
+}
+
+.header-separator {
+  border-top: var(--band) solid var(--color-accent);
+  margin: 8px 0;
+}
+
+.table-wrapper {
+  padding: 12px;
+  margin: 16px 0;
+}
+
+.invoice-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0;
+  font-size: 12px;
+}
+
+.invoice-table thead th {
+  text-align: left;
+  font-size: 11px;
+  font-weight: bold;
+  text-transform: uppercase;
+  padding: 8px 6px;
+  border-bottom: var(--band) solid var(--color-accent);
+  background: transparent;
+}
+
+.invoice-table tbody tr {
+  border-bottom: var(--line) solid var(--color-border);
+}
+
+.invoice-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.invoice-table td {
+  padding: 6px;
+  vertical-align: top;
+}
+
+.invoice-table td.text-right {
+  text-align: right;
+}
+
+.summary-section {
+  padding: 12px;
+  margin: 16px 0;
+  font-size: var(--text);
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: var(--line) solid var(--color-border);
+}
+
+.summary-row:has(+ .summary-row.total) {
+  border-bottom: none;
+}
+
+.summary-row.total {
+  font-size: 15px;
+  font-weight: bold;
+  border-top: var(--band) solid var(--color-accent);
+  border-bottom: var(--band) solid var(--color-accent);
+  margin-top: 6px;
+  padding-top: 10px;
+}
+
+.footer-section {
+  margin-top: 24px;
+  font-size: 12px;
+  color: var(--color-muted);
+}`;
 
 const defaultTemplate = `<div class="invoice-preview" id="invoice-content">
   <div class="invoice-header">
@@ -130,12 +313,18 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => {
   let activeId = getActiveDocumentId();
   let initialData: InvoiceData;
   let initialTemplate: string = defaultTemplate;
+  let initialTheme: string = defaultInvoiceTheme;
 
   if (activeId) {
     const doc = loadDocument(activeId);
     if (doc) {
       initialData = InvoiceDataSchema.parse(doc.data);
       initialTemplate = doc.template || defaultTemplate;
+      // Load theme from document, fallback to default invoice theme
+      initialTheme = doc.theme || (() => {
+        const invoiceTheme = getTheme('theme-invoice-default');
+        return invoiceTheme?.content || defaultInvoiceTheme;
+      })();
     } else {
       // Document not found, create new one
       activeId = createNewDocument();
@@ -154,6 +343,7 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => {
         state.activeDocumentId,
         state.data,
         state.template,
+        state.theme,
         {
           name: `Facture ${state.data.invoice.number}`,
           createdAt: Date.now(),
@@ -167,6 +357,7 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => {
   return {
     data: initialData,
     template: initialTemplate,
+    theme: initialTheme,
     isEditorMode: false,
     isInlineEditMode: false,
     dataVersion: 0,
@@ -189,6 +380,45 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => {
       saveCurrentDocument();
     },
 
+    setTheme: (theme) => {
+      set({ theme });
+      saveCurrentDocument();
+    },
+
+    setTemplateById: (templateId) => {
+      const template = getTemplate(templateId);
+      if (template) {
+        set({ template: template.content });
+        saveCurrentDocument();
+      }
+    },
+
+    setThemeById: (themeId) => {
+      const theme = getTheme(themeId);
+      if (theme) {
+        set({ theme: theme.content });
+        saveCurrentDocument();
+      }
+    },
+    renameTemplate: (templateId: string, newName: string) => {
+      renameTemplate(templateId, newName);
+    },
+    duplicateTemplate: (templateId: string) => {
+      duplicateTemplate(templateId);
+    },
+    deleteTemplate: (templateId: string) => {
+      deleteTemplate(templateId);
+    },
+    renameTheme: (themeId: string, newName: string) => {
+      renameTheme(themeId, newName);
+    },
+    duplicateTheme: (themeId: string) => {
+      duplicateTheme(themeId);
+    },
+    deleteTheme: (themeId: string) => {
+      deleteTheme(themeId);
+    },
+
     toggleEditorMode: () => {
       set((state) => ({ isEditorMode: !state.isEditorMode, isInlineEditMode: false }));
     },
@@ -199,13 +429,16 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => {
 
     resetToSample: () => {
       const data = InvoiceDataSchema.parse(sampleData);
-      set({ data, template: defaultTemplate, dataVersion: get().dataVersion + 1 });
+      const invoiceTheme = getTheme('theme-invoice-default');
+      const themeContent = invoiceTheme?.content || defaultInvoiceTheme;
+      set({ data, template: defaultTemplate, theme: themeContent, dataVersion: get().dataVersion + 1 });
       saveCurrentDocument();
     },
 
     duplicateInvoice: () => {
       const currentData = get().data;
       const currentTemplate = get().template;
+      const currentTheme = get().theme;
       const duplicatedData = {
         ...currentData,
         invoice: {
@@ -221,6 +454,7 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => {
         newId,
         duplicatedData,
         currentTemplate,
+        currentTheme,
         {
           name: `Facture ${duplicatedData.invoice.number}`,
           createdAt: Date.now(),
@@ -232,6 +466,7 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => {
       set({
         data: duplicatedData,
         template: currentTemplate,
+        theme: currentTheme,
         activeDocumentId: newId,
         dataVersion: get().dataVersion + 1,
       });
@@ -247,6 +482,7 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => {
           set({
             data,
             template: parsed.template || get().template,
+            theme: parsed.theme || get().theme,
             dataVersion: get().dataVersion + 1
           });
           saveCurrentDocument();
@@ -263,12 +499,12 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => {
     },
 
     exportToJson: () => {
-      const { data, template } = get();
+      const { data, template, theme } = get();
       const exportData = {
         version: '1.0.0',
         data,
         template,
-        theme: 'cv-default',
+        theme,
       };
       return JSON.stringify(exportData, null, 2);
     },
@@ -277,9 +513,16 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => {
       const doc = loadDocument(id);
       if (doc) {
         const data = InvoiceDataSchema.parse(doc.data);
+        // Load theme from document, fallback to default invoice theme
+        const themeContent = doc.theme || (() => {
+          const invoiceTheme = getTheme('theme-invoice-default');
+          return invoiceTheme?.content || defaultInvoiceTheme;
+        })();
+        
         set({
           data,
           template: doc.template || defaultTemplate,
+          theme: themeContent,
           activeDocumentId: id,
           dataVersion: get().dataVersion + 1,
         });
@@ -289,11 +532,14 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => {
     createDocument: () => {
       const newId = createNewDocument();
       const newData = InvoiceDataSchema.parse(sampleData);
+      const invoiceTheme = getTheme('theme-invoice-default');
+      const themeContent = invoiceTheme?.content || defaultInvoiceTheme;
 
       saveDocument(
         newId,
         newData,
         defaultTemplate,
+        themeContent,
         {
           name: `Facture ${newData.invoice.number}`,
           createdAt: Date.now(),
@@ -305,6 +551,7 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => {
       set({
         data: newData,
         template: defaultTemplate,
+        theme: themeContent,
         activeDocumentId: newId,
         dataVersion: get().dataVersion + 1,
       });

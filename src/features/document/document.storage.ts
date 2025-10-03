@@ -107,6 +107,34 @@ export function deleteTemplate(id: string): void {
   saveTemplates(filtered);
 }
 
+export function renameTemplate(id: string, newName: string): void {
+  const templates = getTemplates();
+  const template = templates.find((t) => t.id === id);
+  if (template) {
+    template.name = newName;
+    template.updatedAt = Date.now();
+    saveTemplates(templates);
+  }
+}
+
+export function duplicateTemplate(id: string): Template | null {
+  const templates = getTemplates();
+  const template = templates.find((t) => t.id === id);
+  if (!template) return null;
+
+  const newTemplate: Template = {
+    ...template,
+    id: `template-${Date.now()}`,
+    name: `${template.name} (copie)`,
+    isDefault: false,
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  };
+
+  saveTemplate(newTemplate);
+  return newTemplate;
+}
+
 // ============================================================================
 // Theme Storage
 // ============================================================================
@@ -141,6 +169,34 @@ export function deleteTheme(id: string): void {
   const themes = getThemes();
   const filtered = themes.filter((t) => t.id !== id);
   saveThemes(filtered);
+}
+
+export function renameTheme(id: string, newName: string): void {
+  const themes = getThemes();
+  const theme = themes.find((t) => t.id === id);
+  if (theme) {
+    theme.name = newName;
+    theme.updatedAt = Date.now();
+    saveThemes(themes);
+  }
+}
+
+export function duplicateTheme(id: string): Theme | null {
+  const themes = getThemes();
+  const theme = themes.find((t) => t.id === id);
+  if (!theme) return null;
+
+  const newTheme: Theme = {
+    ...theme,
+    id: `theme-${Date.now()}`,
+    name: `${theme.name} (copie)`,
+    isDefault: false,
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  };
+
+  saveTheme(newTheme);
+  return newTheme;
 }
 
 // ============================================================================
@@ -349,4 +405,75 @@ export function deleteTag(id: string): void {
 
 export function createTagId(): string {
   return `tag-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+}
+
+// ============================================================================
+// Document Operations
+// ============================================================================
+
+export function moveDocument(documentId: string, projectId: string | undefined): void {
+  const doc = getDocument(documentId);
+  if (!doc) return;
+
+  saveDocument({
+    ...doc,
+    projectId,
+    updatedAt: Date.now(),
+  });
+}
+
+export function duplicateDocument(documentId: string): Document | null {
+  const doc = getDocument(documentId);
+  if (!doc) return null;
+
+  const newDoc: Document = {
+    ...doc,
+    id: createDocumentId(),
+    name: `${doc.name} (copie)`,
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  };
+
+  saveDocument(newDoc);
+  return newDoc;
+}
+
+// ============================================================================
+// Project Operations
+// ============================================================================
+
+export function moveProject(projectId: string, newParentId: string | undefined): void {
+  const project = getProject(projectId);
+  if (!project) return;
+
+  // Prevent circular reference
+  if (newParentId) {
+    const path = getProjectPath(newParentId);
+    if (path.some((p) => p.id === projectId)) {
+      console.error('Cannot move project into its own descendant');
+      return;
+    }
+  }
+
+  saveProject({
+    ...project,
+    parentId: newParentId,
+    updatedAt: Date.now(),
+  });
+}
+
+export function duplicateProject(projectId: string): Project | null {
+  const project = getProject(projectId);
+  if (!project) return null;
+
+  const newProject: Project = {
+    ...project,
+    id: createProjectId(),
+    name: `${project.name} (copie)`,
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  };
+
+  saveProject(newProject);
+  return newProject;
 }

@@ -96,15 +96,16 @@ export function setActiveDocumentId(id: string): void {
   localStorage.setItem(STORAGE_KEY_ACTIVE_DOCUMENT, id);
 }
 
-export function getDocumentKey(id: string, type: 'data' | 'template'): string {
+export function getDocumentKey(id: string, type: 'data' | 'template' | 'theme'): string {
   return `invoice-studio-doc-${id}-${type}`;
 }
 
-export function saveDocument(id: string, data: any, template: string, metadata: Omit<DocumentMetadata, 'id' | 'updatedAt'>): void {
+export function saveDocument(id: string, data: any, template: string, theme: string, metadata: Omit<DocumentMetadata, 'id' | 'updatedAt'>): void {
   try {
-    // Save document data and template
+    // Save document data, template and theme
     saveToLocalStorage(getDocumentKey(id, 'data'), data);
     saveToLocalStorage(getDocumentKey(id, 'template'), template);
+    saveToLocalStorage(getDocumentKey(id, 'theme'), theme);
 
     // Update documents list
     const documents = getDocumentsList();
@@ -126,14 +127,14 @@ export function saveDocument(id: string, data: any, template: string, metadata: 
     setActiveDocumentId(id);
 
     // SYNC: Also save to new document system
-    syncToNewDocumentSystem(id, data, template, metadata);
+    syncToNewDocumentSystem(id, data, template, theme, metadata);
   } catch (error) {
     console.error('Failed to save document:', error);
   }
 }
 
 // Synchronize with new document system
-function syncToNewDocumentSystem(id: string, data: any, _template: string, metadata: Omit<DocumentMetadata, 'id' | 'updatedAt'>): void {
+function syncToNewDocumentSystem(id: string, data: any, _template: string, _theme: string, metadata: Omit<DocumentMetadata, 'id' | 'updatedAt'>): void {
   try {
     // Import dynamically to avoid circular dependency
     import('../features/document/document.storage').then(({ saveDocument: saveNewDoc, getDocument }) => {
@@ -170,15 +171,16 @@ function syncToNewDocumentSystem(id: string, data: any, _template: string, metad
   }
 }
 
-export function loadDocument(id: string): { data: any; template: string | null } | null {
+export function loadDocument(id: string): { data: any; template: string | null; theme: string | null } | null {
   try {
     const data = loadFromLocalStorage(getDocumentKey(id, 'data'));
     const template = loadFromLocalStorage<string>(getDocumentKey(id, 'template'));
+    const theme = loadFromLocalStorage<string>(getDocumentKey(id, 'theme'));
 
     if (!data) return null;
 
     setActiveDocumentId(id);
-    return { data, template };
+    return { data, template, theme };
   } catch (error) {
     console.error('Failed to load document:', error);
     return null;
@@ -189,6 +191,7 @@ export function deleteDocument(id: string): void {
   try {
     localStorage.removeItem(getDocumentKey(id, 'data'));
     localStorage.removeItem(getDocumentKey(id, 'template'));
+    localStorage.removeItem(getDocumentKey(id, 'theme'));
 
     const documents = getDocumentsList();
     const filtered = documents.filter(doc => doc.id !== id);

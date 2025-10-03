@@ -6,7 +6,7 @@ const A4_WIDTH_PX = 794; // 21cm in pixels
 const PADDING = 32; // padding on each side
 
 export function InvoicePreview() {
-  const { data, template } = useInvoiceStore();
+  const { data, template, theme } = useInvoiceStore();
   const [renderedHtml, setRenderedHtml] = React.useState('');
   const [scale, setScale] = React.useState(1);
   const containerRef = React.useRef<HTMLDivElement>(null);
@@ -15,7 +15,22 @@ export function InvoicePreview() {
   React.useEffect(() => {
     try {
       const html = renderTemplate(template, data);
-      setRenderedHtml(html);
+      
+      // Wrap the rendered HTML with the current theme
+      const fullHtml = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <style>${theme}</style>
+        </head>
+        <body>
+          ${html}
+        </body>
+        </html>
+      `;
+      
+      setRenderedHtml(fullHtml);
     } catch (error) {
       console.error('Error rendering template:', error);
       setRenderedHtml(`
@@ -25,7 +40,7 @@ export function InvoicePreview() {
         </div>
       `);
     }
-  }, [data, template]);
+  }, [data, template, theme]);
 
   // Auto-scale to fit container
   React.useEffect(() => {

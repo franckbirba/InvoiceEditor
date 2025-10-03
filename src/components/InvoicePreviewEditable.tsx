@@ -3,7 +3,7 @@ import { InlineEditableField } from './InlineEditableField';
 import { Plus, Trash2 } from 'lucide-react';
 
 export function InvoicePreviewEditable() {
-  const { data, updateData } = useInvoiceStore();
+  const { data, updateData, theme } = useInvoiceStore();
 
   const updateField = (path: string, value: any) => {
     updateData((current) => {
@@ -89,7 +89,9 @@ export function InvoicePreviewEditable() {
   };
 
   return (
-    <div className="invoice-preview bg-white shadow-sm" id="invoice-content">
+    <>
+      <style>{theme}</style>
+      <div className="invoice-preview bg-white shadow-sm" id="invoice-content">
       {/* Header */}
       <div className="invoice-header">
         <div className="invoice-title">FACTURE</div>
@@ -332,6 +334,7 @@ export function InvoicePreviewEditable() {
           />
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }

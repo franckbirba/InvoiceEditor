@@ -6,6 +6,7 @@ import { printInvoice } from '../lib/print';
 import { JsonImportExport } from './JsonImportExport';
 import { LanguageToggle } from './LanguageToggle';
 import { ThemeSwitcher } from './ThemeSwitcher';
+import { TemplateSelector } from './TemplateSelector';
 import { DocumentsNavigationDialog } from './DocumentsNavigationDialog';
 import { useToast } from './Toast';
 import { getDocumentTypes, getDocument } from '../features/document/document.storage';
@@ -178,6 +179,7 @@ export function Topbar() {
 
           {/* Right: Settings */}
           <div className="flex items-center gap-3">
+            <TemplateSelector />
             <ThemeSwitcher />
             <LanguageToggle />
           </div>

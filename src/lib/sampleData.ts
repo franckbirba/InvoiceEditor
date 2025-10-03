@@ -1,0 +1,60 @@
+import type { InvoiceData } from '../features/invoice/invoice.schema';
+
+// Sample invoice data for template preview
+// This matches the actual invoice data structure
+export const sampleInvoiceData: InvoiceData = {
+  version: "1.0.0",
+  locale: "fr",
+  theme: "cv-default",
+  sender: {
+    name: "Franck BIRBA",
+    address: "123 Avenue Example\n75001 Paris, France",
+    email: "contact@example.com",
+    phone: "+33 1 23 45 67 89",
+    bank: "IBAN: FR76 XXXX XXXX XXXX XXXX XXXX XXX",
+    notes: "Consultant en développement web",
+  },
+  client: {
+    name: "Société Client SARL",
+    address: "456 Rue du Commerce\n75002 Paris, France",
+    email: "",
+    phone: "",
+    bank: "",
+    reg: "RCCM: 2024-XXX-XXX / IFU: 123456789",
+    notes: "",
+  },
+  invoice: {
+    number: "2025-001",
+    date: "2025-10-02",
+    subject: "Prestation de développement web - Q4 2025",
+    payment_terms: "Paiement sous 30 jours",
+    currency: "XOF",
+  },
+  items: [
+    {
+      description: "Développement d'application React",
+      qty: 10,
+      unit_price: 50000,
+      discount: 0,
+    },
+    {
+      description: "Consulting et architecture",
+      qty: 5,
+      unit_price: 60000,
+      discount: 10,
+    },
+  ],
+  summary: {
+    global_discount: 0,
+    taxes: [
+      {
+        label: "TVA",
+        rate: 18,
+      },
+    ],
+  },
+  footer: {
+    legal: "Dispense d'immatriculation au RCS - Auto-entrepreneur",
+    signature: "",
+  },
+};
