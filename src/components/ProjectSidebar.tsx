@@ -2,6 +2,7 @@ import * as React from 'react';
 import { FileText, User, ChevronLeft, FolderPlus, FilePlus, Move, Copy, Trash2, Palette, FileCode, Edit, Database, Plus } from 'lucide-react';
 import { ProjectTreeView } from './ProjectTreeView';
 import { CreateProjectDialog } from './CreateProjectDialog';
+import { CreateDocumentDialog } from './CreateDocumentDialog';
 import { MoveItemDialog } from './MoveItemDialog';
 import { ContextMenu } from './ContextMenu';
 import { Tooltip } from './Tooltip';
@@ -47,6 +48,8 @@ export function ProjectSidebar({ isOpen, onToggle, onEditTemplate, onEditTheme, 
   const [documentTypes, setDocumentTypes] = React.useState<StoredDocumentType[]>([]);
   const [showCreateProject, setShowCreateProject] = React.useState(false);
   const [createProjectParentId, setCreateProjectParentId] = React.useState<string | undefined>();
+  const [showCreateDocument, setShowCreateDocument] = React.useState(false);
+  const [createDocumentProjectId, setCreateDocumentProjectId] = React.useState<string | undefined>();
   const [moveDialog, setMoveDialog] = React.useState<{
     type: 'project' | 'document';
     id: string;
@@ -85,33 +88,13 @@ export function ProjectSidebar({ isOpen, onToggle, onEditTemplate, onEditTheme, 
   };
 
   const handleCreateDocumentInProject = (projectId: string) => {
-    const typeId = prompt('Type de document (facture/cv):');
-    if (typeId !== 'facture' && typeId !== 'cv') return;
+    setCreateDocumentProjectId(projectId || undefined);
+    setShowCreateDocument(true);
+  };
 
-    const types = getDocumentTypes();
-    const type = types.find((t) => t.id === typeId);
-    if (!type) return;
-
-    // Create minimal document
-    const docId = createDocumentId();
-    const newDoc: Document = {
-      id: docId,
-      typeId,
-      name: `Nouveau ${type.name}`,
-      data: {},
-      templateId: typeId === 'facture' ? 'facture-cv-default' : 'cv-monospace-default',
-      themeId: 'theme-cv-default',
-      projectId,
-      tags: [],
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    };
-
-    saveNewDocument(newDoc);
-    setActiveDocumentId(docId);
-
-    // Reload the document in the store
-    useInvoiceStore.getState().loadDocumentById(docId);
+  const handleDocumentCreated = (documentId: string) => {
+    setActiveDocumentId(documentId);
+    useInvoiceStore.getState().loadDocumentById(documentId);
     refreshData();
   };
 
@@ -739,6 +722,14 @@ export function ProjectSidebar({ isOpen, onToggle, onEditTemplate, onEditTheme, 
           }
         />
       )}
+
+      {/* Create Document Dialog */}
+      <CreateDocumentDialog
+        open={showCreateDocument}
+        onOpenChange={setShowCreateDocument}
+        projectId={createDocumentProjectId}
+        onDocumentCreated={handleDocumentCreated}
+      />
     </>
   );
 }

@@ -14,8 +14,40 @@ export function InvoicePreview() {
 
   React.useEffect(() => {
     try {
-      const html = renderTemplate(template, data);
-      
+      let html = renderTemplate(template, data);
+
+      // Transform skills in preview mode: apply colors and sizes, hide asterisks
+      html = html.replace(
+        /<span class="skill-items" data-field="([^"]+)">([^<]*)<\/span>/g,
+        (match, fieldName, skillsText) => {
+          if (!skillsText || !skillsText.trim()) {
+            return match;
+          }
+
+          // Split by comma to get individual skills
+          const skills = skillsText.split(',').map(s => s.trim()).filter(Boolean);
+
+          const styledSkills = skills.map((skill) => {
+            // Count asterisks
+            const starCount = (skill.match(/\*/g) || []).length;
+            const skillName = skill.replace(/\*/g, '').trim();
+
+            // Random color from primary colors
+            const colors = ['#1976d2', '#7b1fa2', '#388e3c', '#f57c00', '#c62828'];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+
+            // Size based on stars: 0 stars = 10pt, 1 star = 11pt, 2 stars = 13pt, 3+ stars = 15pt
+            const sizes = ['10pt', '11pt', '13pt', '15pt'];
+            const size = sizes[Math.min(starCount, 3)];
+
+            // Show skill without asterisks
+            return `<span class="skill-item" style="color: ${color}; font-size: ${size};">${skillName}</span>`;
+          }).join(', ');
+
+          return `<span class="skill-items">${styledSkills}</span>`;
+        }
+      );
+
       // Wrap the rendered HTML with the current theme
       const fullHtml = `
         <!DOCTYPE html>
@@ -29,7 +61,7 @@ export function InvoicePreview() {
         </body>
         </html>
       `;
-      
+
       setRenderedHtml(fullHtml);
     } catch (error) {
       console.error('Error rendering template:', error);

@@ -3,11 +3,9 @@ import type { InvoiceData } from './invoice.schema';
 import { InvoiceDataSchema } from './invoice.schema';
 import {
   getActiveDocumentId,
-  loadDocument,
-  saveDocument,
   createNewDocument,
 } from '../../lib/storage';
-import { getTheme, getTemplate, renameTemplate, duplicateTemplate, deleteTemplate, renameTheme, duplicateTheme, deleteTheme } from '../document/document.storage';
+import { getTheme, getTemplate, renameTemplate, duplicateTemplate, deleteTemplate, renameTheme, duplicateTheme, deleteTheme, getDocument, saveDocument as saveDocumentNew } from '../document/document.storage';
 import sampleData from './sample-data.json';
 
 type ActiveView =
@@ -398,18 +396,15 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => {
   const saveCurrentDocument = () => {
     const state = get();
     if (state.activeDocumentId) {
-      saveDocument(
-        state.activeDocumentId,
-        state.data,
-        state.template,
-        state.theme,
-        {
-          name: `Facture ${state.data.invoice.number}`,
-          createdAt: Date.now(),
-          invoiceNumber: state.data.invoice.number,
-          clientName: state.data.client.name,
-        }
-      );
+      const doc = getDocument(state.activeDocumentId);
+      if (doc) {
+        // Update the document with new data
+        saveDocumentNew({
+          ...doc,
+          data: state.data,
+          updatedAt: Date.now(),
+        });
+      }
     }
   };
 
@@ -426,11 +421,42 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => {
     setActiveView: (view) => {
       // If switching to a document, load it
       if (view?.type === 'document') {
-        const doc = loadDocument(view.id);
+        const doc = getDocument(view.id);
         if (doc) {
           try {
-            const data = InvoiceDataSchema.parse(sanitizeInvoiceData(doc.data));
-            const themeContent = doc.theme || (() => {
+            // For invoice documents, validate with schema
+            // For other document types (CV, etc.), use data as-is
+            let data;
+            if (doc.typeId === 'facture') {
+              // Check if data is empty or invalid
+              const hasValidData = doc.data && typeof doc.data === 'object' &&
+                                   Object.keys(doc.data).length > 0;
+
+              if (hasValidData) {
+                try {
+                  data = InvoiceDataSchema.parse(sanitizeInvoiceData(doc.data));
+                } catch (validationError) {
+                  console.warn('Invalid invoice data, using default:', validationError);
+                  // Use default invoice data for corrupted documents
+                  data = sampleData as InvoiceData;
+                }
+              } else {
+                // Empty data, use sample data
+                console.warn('Empty invoice data, using sample data');
+                data = sampleData as InvoiceData;
+              }
+            } else {
+              // For non-invoice documents, use data as-is
+              data = doc.data || {};
+            }
+
+            // Get template content
+            const templateObj = doc.templateId ? getTemplate(doc.templateId) : null;
+            const templateContent = templateObj?.content || defaultTemplate;
+
+            // Get theme content
+            const themeObj = doc.themeId ? getTheme(doc.themeId) : null;
+            const themeContent = themeObj?.content || (() => {
               const invoiceTheme = getTheme('theme-invoice-default');
               return invoiceTheme?.content || defaultInvoiceTheme;
             })();
@@ -438,7 +464,7 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => {
             set({
               activeView: view,
               data,
-              template: doc.template || defaultTemplate,
+              template: templateContent,
               theme: themeContent,
               activeDocumentId: view.id,
               dataVersion: get().dataVersion + 1,
@@ -446,7 +472,7 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => {
               isInlineEditMode: false,
             });
           } catch (error) {
-            console.error('Failed to load document, data validation error:', error);
+            console.error('Failed to load document:', error);
             // Don't crash, just log the error
             alert('Erreur lors du chargement du document. Les données sont peut-être corrompues.');
           }

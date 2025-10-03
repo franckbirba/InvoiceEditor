@@ -59,6 +59,12 @@ export function InvoicePreviewEditable() {
   const itemsCount = React.useMemo(() => data.items?.length || 0, [data.items?.length]);
   const taxesCount = React.useMemo(() => data.summary?.taxes?.length || 0, [data.summary?.taxes?.length]);
 
+  // Track CV array lengths
+  const experiencesCount = React.useMemo(() => (data as any).experiences?.length || 0, [(data as any).experiences?.length]);
+  const skillsCount = React.useMemo(() => (data as any).skills?.length || 0, [(data as any).skills?.length]);
+  const educationCount = React.useMemo(() => (data as any).education?.length || 0, [(data as any).education?.length]);
+  const languagesCount = React.useMemo(() => (data as any).languages?.length || 0, [(data as any).languages?.length]);
+
   // Capture data at mount for initial render
   React.useEffect(() => {
     initialDataRef.current = data;
@@ -83,31 +89,38 @@ export function InvoicePreviewEditable() {
       // This ensures empty fields are still visible for editing
       const dataForRendering = JSON.parse(JSON.stringify(data));
 
-      // Ensure all optional fields have at least an empty string to force Mustache to render them
-      if (!dataForRendering.sender.email) dataForRendering.sender.email = '\u200B'; // Zero-width space
-      if (!dataForRendering.sender.phone) dataForRendering.sender.phone = '\u200B';
-      if (!dataForRendering.sender.address) dataForRendering.sender.address = '\u200B';
-      if (!dataForRendering.sender.bank) dataForRendering.sender.bank = '\u200B';
-      if (!dataForRendering.sender.notes) dataForRendering.sender.notes = '\u200B';
+      // Check if this is invoice data before trying to access invoice-specific fields
+      const isInvoiceData = dataForRendering.sender && dataForRendering.client && dataForRendering.invoice;
 
-      if (!dataForRendering.client.email) dataForRendering.client.email = '\u200B';
-      if (!dataForRendering.client.phone) dataForRendering.client.phone = '\u200B';
-      if (!dataForRendering.client.address) dataForRendering.client.address = '\u200B';
-      if (!dataForRendering.client.bank) dataForRendering.client.bank = '\u200B';
-      if (!dataForRendering.client.reg) dataForRendering.client.reg = '\u200B';
-      if (!dataForRendering.client.notes) dataForRendering.client.notes = '\u200B';
+      if (isInvoiceData) {
+        // Ensure all optional fields have at least an empty string to force Mustache to render them
+        if (!dataForRendering.sender.email) dataForRendering.sender.email = '\u200B'; // Zero-width space
+        if (!dataForRendering.sender.phone) dataForRendering.sender.phone = '\u200B';
+        if (!dataForRendering.sender.address) dataForRendering.sender.address = '\u200B';
+        if (!dataForRendering.sender.bank) dataForRendering.sender.bank = '\u200B';
+        if (!dataForRendering.sender.notes) dataForRendering.sender.notes = '\u200B';
 
-      if (!dataForRendering.invoice.subject) dataForRendering.invoice.subject = '\u200B';
-      if (!dataForRendering.invoice.payment_terms) dataForRendering.invoice.payment_terms = '\u200B';
+        if (!dataForRendering.client.email) dataForRendering.client.email = '\u200B';
+        if (!dataForRendering.client.phone) dataForRendering.client.phone = '\u200B';
+        if (!dataForRendering.client.address) dataForRendering.client.address = '\u200B';
+        if (!dataForRendering.client.bank) dataForRendering.client.bank = '\u200B';
+        if (!dataForRendering.client.reg) dataForRendering.client.reg = '\u200B';
+        if (!dataForRendering.client.notes) dataForRendering.client.notes = '\u200B';
 
-      if (!dataForRendering.footer.legal) dataForRendering.footer.legal = '\u200B';
-      if (!dataForRendering.footer.signature) dataForRendering.footer.signature = '\u200B';
+        if (!dataForRendering.invoice.subject) dataForRendering.invoice.subject = '\u200B';
+        if (!dataForRendering.invoice.payment_terms) dataForRendering.invoice.payment_terms = '\u200B';
 
-      // Ensure at least one tax exists for editing
-      if (!dataForRendering.summary.taxes || dataForRendering.summary.taxes.length === 0) {
-        dataForRendering.summary.taxes = [
-          { label: '\u200B', rate: 0 }
-        ];
+        if (dataForRendering.footer) {
+          if (!dataForRendering.footer.legal) dataForRendering.footer.legal = '\u200B';
+          if (!dataForRendering.footer.signature) dataForRendering.footer.signature = '\u200B';
+        }
+
+        // Ensure at least one tax exists for editing
+        if (!dataForRendering.summary.taxes || dataForRendering.summary.taxes.length === 0) {
+          dataForRendering.summary.taxes = [
+            { label: '\u200B', rate: 0 }
+          ];
+        }
       }
 
       // Render template with current data
@@ -261,6 +274,97 @@ export function InvoicePreviewEditable() {
         }
       });
 
+      // Generic array handling: Find all elements with data-item-index and add delete/add buttons
+      const detectArraySections = () => {
+        const arraySections = new Map<string, { container: Element; items: Element[] }>();
+
+        // Find all items with data-item-index
+        const itemsWithIndex = doc.querySelectorAll('[data-item-index]');
+        console.log('Found items with data-item-index:', itemsWithIndex.length);
+
+        itemsWithIndex.forEach(item => {
+          // Get the array name from data-field attributes
+          const dataField = item.querySelector('[data-field]')?.getAttribute('data-field');
+          console.log('Item data-field:', dataField);
+          if (dataField) {
+            const arrayMatch = dataField.match(/^([^.]+)\.\d+\./);
+            if (arrayMatch) {
+              const arrayName = arrayMatch[1];
+              console.log('Detected array:', arrayName);
+              if (!arraySections.has(arrayName)) {
+                // Find the containing section
+                const container = item.closest('.cv-section, .content-box') || item.parentElement;
+                if (container) {
+                  arraySections.set(arrayName, { container, items: [] });
+                }
+              }
+              arraySections.get(arrayName)?.items.push(item);
+            }
+          }
+        });
+
+        return arraySections;
+      };
+
+      const arraySections = detectArraySections();
+
+      // Also detect empty array containers
+      const emptyArrayContainers = doc.querySelectorAll('[data-array-container]');
+      emptyArrayContainers.forEach(container => {
+        const arrayName = container.getAttribute('data-array-container');
+        if (arrayName && !arraySections.has(arrayName)) {
+          arraySections.set(arrayName, { container, items: [] });
+        }
+      });
+
+      console.log('Array sections detected:', Array.from(arraySections.keys()));
+
+      arraySections.forEach((section, arrayName) => {
+        console.log(`Processing array "${arrayName}" with ${section.items.length} items`);
+        // Add delete buttons to each item (skip items and summary.taxes as they're handled above)
+        if (arrayName !== 'items' && !arrayName.startsWith('summary')) {
+          section.items.forEach((item, idx) => {
+            console.log(`Adding delete button to ${arrayName}[${idx}]`);
+            if (!item.querySelector('.delete-array-item-btn')) {
+              const deleteBtn = doc.createElement('button');
+              deleteBtn.className = 'delete-array-item-btn';
+              deleteBtn.setAttribute('data-array-name', arrayName);
+              deleteBtn.setAttribute('data-item-index', item.getAttribute('data-item-index') || '0');
+              deleteBtn.textContent = '×';
+              deleteBtn.style.cssText = 'opacity: 0.3; cursor: pointer; padding: 2px 8px; margin-right: 8px; color: #dc2626; background: transparent; border: none; font-size: 16px; transition: opacity 0.2s; vertical-align: middle;';
+              deleteBtn.title = 'Supprimer';
+              item.insertBefore(deleteBtn, item.firstChild);
+              console.log('Delete button added successfully');
+            } else {
+              console.log('Delete button already exists, skipping');
+            }
+          });
+
+          // Add "Add" button
+          if (!section.container.querySelector(`.add-array-item-btn[data-array-name="${arrayName}"]`)) {
+            const addButton = doc.createElement('button');
+            addButton.className = 'add-array-item-btn';
+            addButton.setAttribute('data-array-name', arrayName);
+            addButton.textContent = `+ Ajouter`;
+            addButton.style.cssText = 'margin-top: 8px; padding: 6px 12px; background: transparent; color: #3b82f6; border: 1px solid #3b82f6; border-radius: 4px; cursor: pointer; font-size: 13px; transition: all 0.2s;';
+
+            // Insert into the container or after the last item
+            if (section.items.length > 0) {
+              const lastItem = section.items[section.items.length - 1];
+              const contentBox = lastItem.closest('.content-box, [data-array-container]');
+              if (contentBox && contentBox.parentElement) {
+                contentBox.parentElement.insertBefore(addButton, contentBox.nextSibling);
+              } else {
+                lastItem.parentElement?.appendChild(addButton);
+              }
+            } else {
+              // Empty array: add button inside the container
+              section.container.appendChild(addButton);
+            }
+          }
+        }
+      });
+
       html = doc.body.innerHTML;
       setRenderedHtml(html);
     } catch (error) {
@@ -272,7 +376,7 @@ export function InvoicePreviewEditable() {
         </div>
       `);
     }
-  }, [template, theme, itemsCount, taxesCount]); // Re-render when structure changes (items/taxes added/removed)
+  }, [template, theme, itemsCount, taxesCount, experiencesCount, skillsCount, educationCount, languagesCount]); // Re-render when structure changes (items/taxes/arrays added/removed)
 
   // Inject HTML and make fields editable
   React.useEffect(() => {
@@ -852,6 +956,101 @@ export function InvoicePreviewEditable() {
       btn.addEventListener('mouseleave', handleMouseLeave);
     });
 
+    // Handle generic array delete buttons
+    const deleteArrayButtons = container.querySelectorAll<HTMLButtonElement>('.delete-array-item-btn');
+    console.log('Found delete array buttons:', deleteArrayButtons.length);
+    deleteArrayButtons.forEach((btn) => {
+      const handleDelete = () => {
+        const arrayName = btn.getAttribute('data-array-name');
+        const itemIndex = parseInt(btn.getAttribute('data-item-index') || '0');
+        console.log('Delete button clicked for array:', arrayName, 'index:', itemIndex);
+        if (arrayName) {
+          updateData((currentData: any) => {
+            const newData = JSON.parse(JSON.stringify(currentData));
+            if (newData[arrayName] && Array.isArray(newData[arrayName])) {
+              newData[arrayName].splice(itemIndex, 1);
+            }
+            return newData;
+          });
+        }
+      };
+
+      const handleMouseEnter = () => {
+        btn.style.opacity = '1';
+      };
+
+      const handleMouseLeave = () => {
+        btn.style.opacity = '0.3';
+      };
+
+      btn.addEventListener('click', handleDelete);
+      btn.addEventListener('mouseenter', handleMouseEnter);
+      btn.addEventListener('mouseleave', handleMouseLeave);
+    });
+
+    // Handle generic array add buttons
+    const addArrayButtons = container.querySelectorAll<HTMLButtonElement>('.add-array-item-btn');
+    console.log('Found add array buttons:', addArrayButtons.length);
+    addArrayButtons.forEach((btn) => {
+      const handleAdd = () => {
+        const arrayName = btn.getAttribute('data-array-name');
+        console.log('Add button clicked for array:', arrayName);
+        if (arrayName) {
+          updateData((currentData: any) => {
+            const newData = JSON.parse(JSON.stringify(currentData));
+            if (!newData[arrayName]) {
+              newData[arrayName] = [];
+            }
+
+            // Create a template item based on the array name
+            let newItem: any = {};
+            if (arrayName === 'experiences') {
+              newItem = {
+                period: 'Période',
+                company: 'Entreprise',
+                position: 'Poste',
+                description: 'Description',
+                achievements: '',
+              };
+            } else if (arrayName === 'skills') {
+              newItem = {
+                category: 'Nouvelle catégorie',
+                items: 'skill1*, skill2**, skill3***',
+              };
+            } else if (arrayName === 'education') {
+              newItem = {
+                year: 'Année',
+                degree: 'Diplôme',
+                institution: 'Institution',
+              };
+            } else if (arrayName === 'languages') {
+              newItem = {
+                name: 'Langue',
+                level: 'Niveau',
+              };
+            }
+
+            newData[arrayName].push(newItem);
+            return newData;
+          });
+        }
+      };
+
+      const handleMouseEnter = () => {
+        btn.style.backgroundColor = '#3b82f6';
+        btn.style.color = 'white';
+      };
+
+      const handleMouseLeave = () => {
+        btn.style.backgroundColor = 'transparent';
+        btn.style.color = '#3b82f6';
+      };
+
+      btn.addEventListener('click', handleAdd);
+      btn.addEventListener('mouseenter', handleMouseEnter);
+      btn.addEventListener('mouseleave', handleMouseLeave);
+    });
+
     // Mark non-editable content areas
     const allTextElements = container.querySelectorAll('td, th, div, span, p, strong');
     allTextElements.forEach((el) => {
@@ -861,7 +1060,9 @@ export function InvoicePreviewEditable() {
           !htmlEl.querySelector('[data-field]') &&
           htmlEl.textContent?.trim() &&
           !htmlEl.classList.contains('delete-item-btn') &&
-          !htmlEl.classList.contains('add-item-btn')) {
+          !htmlEl.classList.contains('add-item-btn') &&
+          !htmlEl.classList.contains('delete-array-item-btn') &&
+          !htmlEl.classList.contains('add-array-item-btn')) {
         htmlEl.classList.add('non-editable-field');
       }
     });
@@ -943,6 +1144,15 @@ export function InvoicePreviewEditable() {
     if (!contentRef.current) return;
 
     const container = contentRef.current;
+
+    // Check if this is invoice data before enriching
+    const isInvoiceData = data && typeof data === 'object' &&
+                          'items' in data && 'invoice' in data && 'sender' in data;
+
+    if (!isInvoiceData) {
+      // Not invoice data, skip calculations
+      return;
+    }
 
     // Re-calculate enriched data with totals
     const enriched = enrichInvoiceData(data);

@@ -16,6 +16,7 @@ import {
 import {
   defaultCVType,
   defaultCVTemplate,
+  defaultCVTheme,
 } from './defaults/cv.default';
 import {
   needsMigration,
@@ -137,13 +138,13 @@ export function initializeDocumentSystem(): {
       };
       saveTemplate(template);
     }
-    if (!existingTemplates.find((t) => t.id === defaultCVTemplate.id)) {
-      const cvTemplate = {
-        ...defaultCVTemplate,
-        content: defaultCVTemplate.content,
-      };
-      saveTemplate(cvTemplate);
-    }
+    // Always update CV template to ensure latest version
+    const cvTemplate = {
+      ...defaultCVTemplate,
+      content: defaultCVTemplate.content,
+      updatedAt: Date.now(),
+    };
+    saveTemplate(cvTemplate);
 
     const existingThemes = getThemes();
     if (!existingThemes.find((t) => t.id === defaultFactureTheme.id)) {
@@ -153,6 +154,13 @@ export function initializeDocumentSystem(): {
       };
       saveTheme(theme);
     }
+
+    // Always update CV theme to ensure latest version
+    const cvTheme = {
+      ...defaultCVTheme,
+      updatedAt: Date.now(),
+    };
+    saveTheme(cvTheme);
 
     // Add default invoice theme
     const defaultInvoiceTheme = {

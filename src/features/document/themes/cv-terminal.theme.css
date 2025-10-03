@@ -1,30 +1,24 @@
 :root {
-  /* Colors - Terminal Theme */
-  --color-bg: #f5f5f5;
+  /* Colors matching the PDF */
+  --color-bg: #ffffff;
   --color-fg: #2c3e50;
-  --color-muted: #666666;
-  --color-accent: #27ae60;
-  --color-red: #e74c3c;
-  --color-border: #bdc3c7;
-  --color-box: #ecf0f1;
-  --chip-bg: #ecf0f1;
-  --chip-fg: #2c3e50;
+  --color-box-bg: #f0f0f0;
+  --color-green: #27ae60;
+  --color-red: #c0392b;
+  --color-blue: #2980b9;
+  --color-orange: #e67e22;
+  --color-border: #333333;
 
   /* Typography - Monospace */
   --font-mono: 'Courier New', Courier, monospace;
-  --h1: 22pt;
-  --h2: 12pt;
-  --text: 11pt;
-  --mono: 11pt;
-  --tracking: 2px;
+  --h1: 18pt;
+  --h2: 11pt;
+  --text: 10pt;
 
   /* Layout */
   --page-w: 794px;
   --page-pad: 40px;
-  --radius: 5px;
   --gap: 15px;
-  --line: 1px;
-  --band: 2px;
 }
 
 /* CV Preview Container */
@@ -36,80 +30,82 @@
   color: var(--color-fg);
   font-family: var(--font-mono);
   font-size: var(--text);
-  line-height: 1.6;
-}
-
-/* Prompt */
-.prompt {
-  color: var(--color-accent);
-  font-weight: bold;
-  font-size: 10pt;
-  margin-bottom: 5px;
+  line-height: 1.5;
 }
 
 /* Header */
 .cv-header {
   text-align: center;
-  margin-bottom: 40px;
+  margin-bottom: 30px;
 }
 
-.header-separator {
-  border: none;
-  border-top: var(--band) solid var(--color-accent);
+.double-separator {
+  border-top: 3px double var(--color-green);
   margin: 10px 0;
 }
 
 .cv-title {
   font-size: var(--h1);
   font-weight: bold;
-  margin: 10px 0;
-  letter-spacing: var(--tracking);
+  margin: 15px 0 5px 0;
   color: var(--color-fg);
+  letter-spacing: 1px;
 }
 
 .cv-subtitle {
   font-size: var(--h2);
-  color: #555;
-  letter-spacing: 1px;
+  color: var(--color-fg);
+  margin: 5px 0 15px 0;
+  letter-spacing: 0.5px;
 }
 
 /* Sections */
 .cv-section {
-  margin-bottom: 30px;
-  page-break-inside: avoid;
-}
-
-.section-title {
-  color: var(--color-accent);
-  font-size: var(--h2);
-  font-weight: bold;
-  margin-bottom: 15px;
-}
-
-.terminal-box {
-  background-color: var(--color-box);
-  padding: 15px;
-  border-radius: var(--radius);
-  margin-bottom: 15px;
-}
-
-.section-content {
-  white-space: pre-line;
-}
-
-/* Contact */
-.contact-line {
-  margin-bottom: 3px;
-}
-
-/* Experience */
-.experience-item {
   margin-bottom: 20px;
   page-break-inside: avoid;
 }
 
-.experience-header {
+.section-title {
+  color: var(--color-green);
+  font-size: var(--text);
+  font-weight: bold;
   margin-bottom: 8px;
+}
+
+.section-title .command {
+  color: var(--color-green);
+  font-weight: normal;
+}
+
+.content-box {
+  background-color: var(--color-box-bg);
+  padding: 15px;
+  margin-bottom: 5px;
+}
+
+.section-content {
+  white-space: pre-line;
+  line-height: 1.6;
+}
+
+/* Contact */
+.contact-line {
+  margin-bottom: 2px;
+  line-height: 1.4;
+}
+
+/* Experience */
+.experience-item {
+  margin-bottom: 15px;
+}
+
+.experience-item:last-child {
+  margin-bottom: 0;
+}
+
+.experience-header {
+  margin-bottom: 5px;
+  line-height: 1.4;
 }
 
 .experience-period {
@@ -117,63 +113,47 @@
   font-weight: bold;
 }
 
-.experience-company {
-  font-weight: bold;
+.arrow {
+  color: var(--color-fg);
 }
 
 .experience-description {
-  margin-left: 20px;
-  margin-top: 8px;
+  margin-top: 5px;
+  margin-left: 0;
   white-space: pre-line;
+  line-height: 1.5;
 }
 
 .experience-achievements {
-  margin-left: 20px;
   margin-top: 5px;
-}
-
-.separator {
-  border: none;
-  border-top: var(--line) dashed var(--color-border);
-  margin: 15px 0;
+  margin-left: 0;
+  white-space: pre-line;
+  line-height: 1.5;
 }
 
 /* Skills */
-.skills-grid {
-  display: grid;
-  gap: 8px;
+.skills-separator {
+  border-top: 1px solid var(--color-border);
+  margin: 10px 0;
 }
 
-.skill-line {
-  display: flex;
-  gap: 10px;
-}
-
-.skill-label {
-  min-width: 120px;
-  font-weight: bold;
-}
-
-.skill-value {
-  color: #2980b9;
-}
-
-.skill-highlight {
-  color: var(--color-red);
-  font-weight: bold;
+.skills-content {
+  white-space: pre-line;
+  line-height: 1.6;
 }
 
 /* Education */
 .education-tree {
-  margin-left: 20px;
+  margin-left: 0;
+  line-height: 1.6;
 }
 
 .education-item {
-  margin-bottom: 5px;
+  margin-bottom: 3px;
 }
 
 .tree-branch {
-  color: #7f8c8d;
+  color: var(--color-fg);
   margin-right: 5px;
 }
 
@@ -185,20 +165,17 @@
 /* Languages */
 .language-item {
   margin-bottom: 5px;
-}
-
-.flag {
-  margin-right: 8px;
+  line-height: 1.5;
 }
 
 /* Footer */
-.cv-footer {
-  margin-top: 40px;
+.footer-content {
   text-align: center;
+  line-height: 1.6;
 }
 
-.cv-footer a {
-  color: #2980b9;
+.footer-content a {
+  color: var(--color-blue);
   text-decoration: underline;
 }
 
@@ -207,6 +184,10 @@
   .cv-preview {
     padding: 20px;
     max-width: 100%;
+  }
+
+  .content-box {
+    break-inside: avoid;
   }
 }
 

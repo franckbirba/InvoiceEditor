@@ -60,11 +60,49 @@ export function enrichInvoiceData(data: InvoiceData): TemplateData {
   };
 }
 
-export function renderTemplate(template: string, data: InvoiceData): string {
-  const enrichedData = enrichInvoiceData(data);
+// Generic function to add index to all arrays in an object
+function enrichArraysWithIndex(obj: any): any {
+  if (Array.isArray(obj)) {
+    return obj.map((item, index) => ({
+      ...item,
+      index,
+    }));
+  }
+
+  if (obj && typeof obj === 'object') {
+    const enriched: any = {};
+    for (const [key, value] of Object.entries(obj)) {
+      enriched[key] = enrichArraysWithIndex(value);
+    }
+    return enriched;
+  }
+
+  return obj;
+}
+
+export function renderTemplate(template: string, data: InvoiceData | any): string {
+  // Try to enrich data if it's an invoice, otherwise use data as-is
+  let enrichedData: any;
+  try {
+    // Check if data has invoice structure
+    if (data && typeof data === 'object' && 'items' in data && 'invoice' in data && 'sender' in data) {
+      enrichedData = enrichInvoiceData(data as InvoiceData);
+    } else {
+      // For non-invoice documents (like CV), add index to all arrays
+      enrichedData = enrichArraysWithIndex(data);
+      console.log('Enriched CV data:', enrichedData);
+    }
+  } catch (error) {
+    console.warn('Failed to enrich invoice data, using raw data:', error);
+    enrichedData = data;
+  }
 
   // Render with Mustache
-  const rendered = Mustache.render(template, enrichedData);
+  let rendered = Mustache.render(template, enrichedData);
+  console.log('Rendered HTML sample:', rendered.substring(0, 500));
+
+  // Don't transform skills in the HTML - keep original text with asterisks
+  // Styling will be done in preview mode only via a separate preview component
 
   // Sanitize with DOMPurify
   const sanitized = DOMPurify.sanitize(rendered, {
@@ -72,9 +110,9 @@ export function renderTemplate(template: string, data: InvoiceData): string {
       'div', 'span', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
       'table', 'thead', 'tbody', 'tr', 'th', 'td',
       'ul', 'ol', 'li', 'br', 'hr', 'strong', 'em', 'b', 'i',
-      'img', 'section', 'article', 'header', 'footer', 'main'
+      'img', 'section', 'article', 'header', 'footer', 'main', 'a'
     ],
-    ALLOWED_ATTR: ['class', 'id', 'style', 'src', 'alt', 'width', 'height'],
+    ALLOWED_ATTR: ['class', 'id', 'style', 'src', 'alt', 'width', 'height', 'href', 'target', 'data-field', 'data-item-index', 'data-array-name', 'data-tax-index'],
   });
 
   return sanitized;

@@ -106,7 +106,7 @@ export const defaultFactureTemplate: Template = {
 // Default theme will be loaded from theme-cv.css
 export const defaultFactureTheme: Theme = {
   id: 'theme-cv-default',
-  name: 'Thème CV',
+  name: 'Thème Facture Terminal',
   content: '', // Will be populated from theme-cv.css
   isDefault: true,
   createdAt: Date.now(),
