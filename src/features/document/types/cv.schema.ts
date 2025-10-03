@@ -1,0 +1,215 @@
+import type { DocumentTypeDefinition } from '../document-schema';
+
+export const cvDocumentType: DocumentTypeDefinition = {
+  type: 'cv',
+  name: 'CV',
+  description: 'Curriculum Vitae',
+  sections: [
+    {
+      id: 'header',
+      title: 'En-tête',
+      description: 'Informations principales',
+      fields: [
+        {
+          path: 'header.name',
+          label: 'Nom complet',
+          type: 'text',
+          editable: true,
+          required: true,
+        },
+        {
+          path: 'header.title',
+          label: 'Titre / Poste',
+          type: 'text',
+          editable: true,
+          required: true,
+        },
+        {
+          path: 'header.prompt',
+          label: 'Prompt terminal',
+          type: 'text',
+          editable: true,
+          required: false,
+        },
+      ],
+    },
+    {
+      id: 'identity',
+      title: 'Identité / Présentation',
+      description: 'Section "whoami"',
+      fields: [
+        {
+          path: 'identity.summary',
+          label: 'Résumé professionnel',
+          type: 'textarea',
+          editable: true,
+          required: true,
+        },
+      ],
+    },
+    {
+      id: 'contact',
+      title: 'Contact',
+      description: 'Coordonnées',
+      fields: [
+        {
+          path: 'contact.email',
+          label: 'Email',
+          type: 'text',
+          editable: true,
+          required: true,
+        },
+        {
+          path: 'contact.phone',
+          label: 'Téléphone(s)',
+          type: 'text',
+          editable: true,
+          required: false,
+        },
+        {
+          path: 'contact.location',
+          label: 'Localisation',
+          type: 'text',
+          editable: true,
+          required: false,
+        },
+      ],
+    },
+    {
+      id: 'experience',
+      title: 'Expériences professionnelles',
+      description: 'Parcours professionnel',
+      repeatable: true,
+      fields: [
+        {
+          path: 'experiences[].period',
+          label: 'Période',
+          type: 'text',
+          editable: true,
+          required: true,
+        },
+        {
+          path: 'experiences[].company',
+          label: 'Entreprise',
+          type: 'text',
+          editable: true,
+          required: true,
+        },
+        {
+          path: 'experiences[].position',
+          label: 'Poste',
+          type: 'text',
+          editable: true,
+          required: true,
+        },
+        {
+          path: 'experiences[].description',
+          label: 'Description',
+          type: 'textarea',
+          editable: true,
+          required: false,
+        },
+        {
+          path: 'experiences[].achievements',
+          label: 'Réalisations (liste)',
+          type: 'textarea',
+          editable: true,
+          required: false,
+        },
+      ],
+    },
+    {
+      id: 'skills',
+      title: 'Compétences',
+      description: 'Compétences techniques et soft skills',
+      fields: [
+        {
+          path: 'skills.technical',
+          label: 'Compétences techniques',
+          type: 'textarea',
+          editable: true,
+          required: false,
+        },
+        {
+          path: 'skills.soft',
+          label: 'Compétences transversales',
+          type: 'textarea',
+          editable: true,
+          required: false,
+        },
+      ],
+    },
+    {
+      id: 'education',
+      title: 'Formation',
+      description: 'Parcours académique',
+      repeatable: true,
+      fields: [
+        {
+          path: 'education[].year',
+          label: 'Année',
+          type: 'text',
+          editable: true,
+          required: true,
+        },
+        {
+          path: 'education[].degree',
+          label: 'Diplôme',
+          type: 'text',
+          editable: true,
+          required: true,
+        },
+        {
+          path: 'education[].institution',
+          label: 'Établissement',
+          type: 'text',
+          editable: true,
+          required: true,
+        },
+      ],
+    },
+    {
+      id: 'languages',
+      title: 'Langues',
+      description: 'Langues parlées',
+      repeatable: true,
+      fields: [
+        {
+          path: 'languages[].name',
+          label: 'Langue',
+          type: 'text',
+          editable: true,
+          required: true,
+        },
+        {
+          path: 'languages[].level',
+          label: 'Niveau',
+          type: 'text',
+          editable: true,
+          required: true,
+        },
+      ],
+    },
+    {
+      id: 'footer',
+      title: 'Pied de page',
+      description: 'Liens et signature',
+      fields: [
+        {
+          path: 'footer.website',
+          label: 'Site web / LinkedIn',
+          type: 'text',
+          editable: true,
+          required: false,
+        },
+        {
+          path: 'footer.github',
+          label: 'GitHub',
+          type: 'text',
+          editable: true,
+          required: false,
+        },
+      ],
+    },
+  ],
+};

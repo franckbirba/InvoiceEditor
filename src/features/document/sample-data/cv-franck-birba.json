@@ -1,0 +1,87 @@
+{
+  "header": {
+    "name": "FRANCK BIRBA",
+    "title": "CTO / TECH ARCHITECT / STARTUP BUILDER",
+    "prompt": "Python"
+  },
+  "identity": {
+    "summary": "Leader technique passionné avec plus de 15 ans d'expérience, j'accompagne startups, DSI et fondateurs dans la conception et la mise en œuvre de solutions logicielles robustes, évolutives et intelligentes.\n\nSpécialiste des architectures innovantes, du développement produit, de l'automatisation et plus récemment des agents IA, j'interviens de la phase MVP à l'industrialisation, avec un fort biais pour l'efficacité, la clarté et l'impact.\n\nBasé entre Paris et Abidjan, je construis des ponts entre les écosystèmes tech d'Europe et d'Afrique."
+  },
+  "contact": {
+    "email": "franckbirba@gmail.com",
+    "phone": "+33 6 48 04 58 33 (FR) | +225 07 15 64 46 82 (CI)",
+    "location": "Gennevilliers | Cocody Bonoumin"
+  },
+  "experiences": [
+    {
+      "period": "2024–2025",
+      "company": "Ionis Groupe",
+      "position": "Lead-développeur",
+      "description": "En charge de la refonte, maintenance et évolution de la console bocal. Outil intranet de contrôle d'accès Active directory en python.",
+      "achievements": ""
+    },
+    {
+      "period": "2018–2025",
+      "company": "Leya",
+      "position": "Co-founder / Directeur Abidjan",
+      "description": "Plateforme de gestion de float et trésorerie pour les réseaux mobile money.",
+      "achievements": "✔ Conception et développement du MVP initial jusqu'à la version scalable.\n✔ Déploiement opérationnel à Abidjan : logistique, RH, gestion terrain.\n✔ Signature de partenariats financiers et commerciaux avec acteurs clés."
+    },
+    {
+      "period": "2015–2020",
+      "company": "Société Générale (Freelance)",
+      "position": "Architecte solution",
+      "description": "Mission au sein de la banque en ligne (DSI centrale – Paris).",
+      "achievements": "✔ Design d'architectures modernes pour les services digitaux.\n✔ Prototypage d'outils internes, automatisation des process, CI/CD.\n✔ Veille techno, support aux squads, industrialisation des solutions retenues.\n✔ Travail transverse avec sécurité, réseau, dev et produit."
+    },
+    {
+      "period": "2012–2017",
+      "company": "UBQT / Neocity / Adduna",
+      "position": "CTO / Founder",
+      "description": "",
+      "achievements": "🔹 <strong>UBQT</strong>\nPlateforme média temps réel – reconstruction d'événements via contenus sociaux.\n✔ Architecture full AWS, MVP → bêta publique.\n✔ Incubé chez Microsoft Spark & TheFamily.\n\n🔹 <strong>Neocity</strong>\nApplication mobile modulable pour collectivités (SaaS B2G).\n✔ Back-office configurateur, app Android/iOS, API REST.\n\n🔹 <strong>ADDUNA</strong>\nCabinet tech spécialisé en innovation & prototypage.\n✔ Développement de RunClouds (PaaS maison, type AWS-lite).\n✔ Missions de conseil, audit, dev en régie et au forfait."
+    },
+    {
+      "period": "2011–2013",
+      "company": "Bouygues Telecom (Freelance)",
+      "position": "Chef de projet mobile",
+      "description": "",
+      "achievements": "✔ Pilotage d'une équipe de 20 développeurs sur les apps Android / iOS.\n✔ Interface avec les équipes produit, marketing, UX.\n✔ Responsable performance et qualité des applications mobiles/tablettes.\n✔ Suivi des déploiements store & gestion de la roadmap technique."
+    }
+  ],
+  "skills": {
+    "technical": "<div class=\"skills-grid\">\n<div class=\"skill-line\"><span class=\"skill-label\">Cloud</span> : <span class=\"skill-highlight\">AWS★</span>, Serverless, Docker, GitLab CI/CD</div>\n<div class=\"skill-line\"><span class=\"skill-label\">Backend</span> : <span class=\"skill-highlight\">Python★</span>, Node.js*, FastAPI</div>\n<div class=\"skill-line\"><span class=\"skill-label\">Frontend</span> : <span class=\"skill-highlight\">React★</span>, Next.js</div>\n<div class=\"skill-line\"><span class=\"skill-label\">Mobile</span> : React Native, Android Java, iOS Obj-C</div>\n<div class=\"skill-line\"><span class=\"skill-label\">Databases</span> : <span class=\"skill-highlight\">PostgreSQL★</span>, MongoDB, MySQL</div>\n<div class=\"skill-line\"><span class=\"skill-label\">DevOps</span> : Git, ELK, MFA, Bash, Nginx</div>\n<div class=\"skill-line\"><span class=\"skill-label\">AI Stack</span> : <span class=\"skill-value\">OpenAI API</span>, LlamaIndex, <span class=\"skill-highlight\">CrewAI</span>, LangChain</div>\n</div>",
+    "soft": ""
+  },
+  "education": [
+    {
+      "year": "2009",
+      "degree": "MASTER",
+      "institution": "Epitech Paris - Sciences & technologies de l'information"
+    },
+    {
+      "year": "2008",
+      "degree": "BACHELOR",
+      "institution": "Dalian Polytechnique _chine_"
+    },
+    {
+      "year": "2004",
+      "degree": "BAC",
+      "institution": "STI _enrea_newton_"
+    }
+  ],
+  "languages": [
+    {
+      "name": "Français",
+      "level": "natif"
+    },
+    {
+      "name": "Anglais",
+      "level": "courant (tech & business)"
+    }
+  ],
+  "footer": {
+    "website": "https://www.linkedin.com/in/franck-birba/",
+    "github": ""
+  }
+}
