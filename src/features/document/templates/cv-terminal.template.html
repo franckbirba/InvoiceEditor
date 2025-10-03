@@ -1,9 +1,9 @@
 <div class="cv-preview" id="cv-content">
   <!-- Header -->
   <div class="cv-header">
-    {{#if header.prompt}}
+    {{#header.prompt}}
     <div class="prompt">{{header.prompt}}</div>
-    {{/if}}
+    {{/header.prompt}}
     <hr class="header-separator">
     <h1 class="cv-title">{{header.name}}</h1>
     <div class="cv-subtitle">{{header.title}}</div>
@@ -11,7 +11,7 @@
   </div>
 
   <!-- Identity Section -->
-  {{#if identity.summary}}
+  {{#identity.summary}}
   <div class="cv-section">
     <div class="section-title">~/cv/identity: whoami</div>
     <div class="terminal-box">
@@ -19,55 +19,53 @@
       <div class="section-content">{{identity.summary}}</div>
     </div>
   </div>
-  {{/if}}
+  {{/identity.summary}}
 
   <!-- Contact Section -->
   <div class="cv-section">
     <div class="section-title">~/cv/contact: cat contact.txt</div>
     <div class="terminal-box">
       <div class="prompt">{{header.prompt}}</div>
-      {{#if contact.email}}
+      {{#contact.email}}
       <div class="contact-line">📧 {{contact.email}}</div>
-      {{/if}}
-      {{#if contact.phone}}
+      {{/contact.email}}
+      {{#contact.phone}}
       <div class="contact-line">📱 {{contact.phone}}</div>
-      {{/if}}
-      {{#if contact.location}}
+      {{/contact.phone}}
+      {{#contact.location}}
       <div class="contact-line">📍 {{contact.location}}</div>
-      {{/if}}
+      {{/contact.location}}
     </div>
   </div>
 
   <!-- Experience Section -->
-  {{#if experiences}}
+  {{#experiences}}
   <div class="cv-section">
     <div class="section-title">~/cv/experience: cat experience.txt</div>
     <div class="terminal-box">
       <div class="prompt">{{header.prompt}}</div>
-      {{#each experiences}}
+      {{#.}}
       <div class="experience-item">
         <div class="experience-header">
-          <span class="experience-period">[{{this.period}}]</span> ▶
-          <span class="experience-company">{{this.company}}</span> –
-          <span>{{this.position}}</span>
+          <span class="experience-period">[{{period}}]</span> ▶
+          <span class="experience-company">{{company}}</span> –
+          <span>{{position}}</span>
         </div>
-        {{#if this.description}}
-        <div class="experience-description">{{this.description}}</div>
-        {{/if}}
-        {{#if this.achievements}}
-        <div class="experience-achievements">{{{this.achievements}}}</div>
-        {{/if}}
+        {{#description}}
+        <div class="experience-description">{{description}}</div>
+        {{/description}}
+        {{#achievements}}
+        <div class="experience-achievements">{{{achievements}}}</div>
+        {{/achievements}}
       </div>
-      {{#unless @last}}
       <hr class="separator">
-      {{/unless}}
-      {{/each}}
+      {{/.}}
     </div>
   </div>
-  {{/if}}
+  {{/experiences}}
 
   <!-- Skills Section -->
-  {{#if skills.technical}}
+  {{#skills.technical}}
   <div class="cv-section">
     <div class="section-title">~/cv/skills: cat tech-skills.txt</div>
     <div class="terminal-box">
@@ -77,57 +75,55 @@
       </div>
     </div>
   </div>
-  {{/if}}
+  {{/skills.technical}}
 
   <!-- Education Section -->
-  {{#if education}}
+  {{#education}}
   <div class="cv-section">
     <div class="section-title">~/cv/formation: tree</div>
     <div class="terminal-box">
       <div class="prompt">{{header.prompt}}</div>
       <div class="education-tree">
         .
-        {{#each education}}
+        {{#.}}
         <div class="education-item">
-          <span class="tree-branch">{{#if @last}}└──{{else}}├──{{/if}}</span>
-          <strong>{{this.degree}}</strong> {{this.institution}}
-          <span class="education-year">{{this.year}}</span>
+          <span class="tree-branch">├──</span>
+          <strong>{{degree}}</strong> {{institution}}
+          <span class="education-year">{{year}}</span>
         </div>
-        {{/each}}
+        {{/.}}
       </div>
     </div>
   </div>
-  {{/if}}
+  {{/education}}
 
   <!-- Languages Section -->
-  {{#if languages}}
+  {{#languages}}
   <div class="cv-section">
     <div class="section-title">~/cv/langues: cat langues.txt</div>
     <div class="terminal-box">
       <div class="prompt">{{header.prompt}}</div>
-      {{#each languages}}
+      {{#.}}
       <div class="language-item">
         <span class="flag">🌐</span>
-        <strong>{{this.name}}</strong> : {{this.level}}
+        <strong>{{name}}</strong> : {{level}}
       </div>
-      {{/each}}
+      {{/.}}
     </div>
   </div>
-  {{/if}}
+  {{/languages}}
 
   <!-- Footer Section -->
-  {{#if footer.website}}
+  {{#footer.website}}
   <div class="cv-section cv-footer">
     <div class="section-title">~/cv: cat signature.txt</div>
     <div class="terminal-box">
       <div class="prompt">{{header.prompt}}</div>
-      {{#if footer.website}}
       <a href="{{footer.website}}" target="_blank">{{footer.website}}</a>
-      {{/if}}
-      {{#if footer.github}}
+      {{#footer.github}}
       <br><a href="{{footer.github}}" target="_blank">{{footer.github}}</a>
-      {{/if}}
+      {{/footer.github}}
     </div>
   </div>
-  {{/if}}
+  {{/footer.website}}
 </div>

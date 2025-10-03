@@ -107,97 +107,137 @@ export const defaultCVType: DocumentType = {
 
 // Default CV template
 export const defaultCVTemplate: Template = {
-  id: 'cv-monospace-default',
-  name: 'Template CV Monospace',
+  id: 'cv-terminal-default',
+  name: 'Template CV Terminal',
   typeId: 'cv',
-  content: `<div class="invoice-preview" id="invoice-content">
-  <!-- Header with name and title -->
-  <div class="invoice-header">
-    <div class="invoice-title">{{personal.name}}</div>
-    {{#personal.title}}
-    <div class="header-separator"></div>
-    <div style="text-align: center; font-size: 14px; color: #666; margin: 8px 0;">{{personal.title}}</div>
-    {{/personal.title}}
-    <div class="header-separator"></div>
+  content: `<div class="cv-preview" id="cv-content">
+  <!-- Header -->
+  <div class="cv-header">
+    {{#header.prompt}}
+    <div class="prompt">{{header.prompt}}</div>
+    {{/header.prompt}}
+    <hr class="header-separator">
+    <h1 class="cv-title">{{header.name}}</h1>
+    <div class="cv-subtitle">{{header.title}}</div>
+    <hr class="header-separator">
   </div>
 
-  <!-- Contact info -->
-  <div style="text-align: center; font-size: 12px; margin: 8px 0 16px 0;">
-    {{#personal.email}}📧 {{personal.email}} | {{/personal.email}}
-    {{#personal.phone}}📱 {{personal.phone}} | {{/personal.phone}}
-    {{#personal.address}}📍 {{personal.address}}{{/personal.address}}
-  </div>
-
-  {{#personal.website}}
-  <div style="text-align: center; font-size: 12px; margin-bottom: 16px;">
-    🌐 {{personal.website}}
-    {{#personal.linkedin}} | 💼 {{personal.linkedin}}{{/personal.linkedin}}
-    {{#personal.github}} | 💻 {{personal.github}}{{/personal.github}}
-  </div>
-  {{/personal.website}}
-
-  <!-- Summary -->
-  {{#summary.summary}}
-  <div class="section-title">Résumé professionnel</div>
-  <div class="highlight-box">{{summary.summary}}</div>
-  {{/summary.summary}}
-
-  <!-- Experience -->
-  {{#experience.experiences}}
-  <div class="section-title">Expérience professionnelle</div>
-  {{#.}}
-  <div style="margin-bottom: 12px;">
-    <div style="display: flex; justify-content: space-between; align-items: baseline;">
-      <strong>{{position}}</strong>
-      <span style="font-size: 12px; color: #666;">
-        {{start_date}}{{#end_date}} - {{end_date}}{{/end_date}}{{#current}} - Présent{{/current}}
-      </span>
+  <!-- Identity Section -->
+  {{#identity.summary}}
+  <div class="cv-section">
+    <div class="section-title">~/cv/identity: whoami</div>
+    <div class="terminal-box">
+      <div class="prompt">{{header.prompt}}</div>
+      <div class="section-content">{{identity.summary}}</div>
     </div>
-    <div style="color: #d32f2f; margin: 2px 0;">{{company}}{{#location}} • {{location}}{{/location}}</div>
-    {{#description}}
-    <div style="margin-top: 4px; font-size: 13px; white-space: pre-line;">{{description}}</div>
-    {{/description}}
   </div>
-  {{/.}}
-  {{/experience.experiences}}
+  {{/identity.summary}}
 
-  <!-- Education -->
-  {{#education.education}}
-  <div class="section-title">Formation</div>
-  {{#.}}
-  <div style="margin-bottom: 12px;">
-    <div style="display: flex; justify-content: space-between; align-items: baseline;">
-      <strong>{{degree}}</strong>
-      {{#year}}<span style="font-size: 12px; color: #666;">{{year}}</span>{{/year}}
+  <!-- Contact Section -->
+  <div class="cv-section">
+    <div class="section-title">~/cv/contact: cat contact.txt</div>
+    <div class="terminal-box">
+      <div class="prompt">{{header.prompt}}</div>
+      {{#contact.email}}
+      <div class="contact-line">📧 {{contact.email}}</div>
+      {{/contact.email}}
+      {{#contact.phone}}
+      <div class="contact-line">📱 {{contact.phone}}</div>
+      {{/contact.phone}}
+      {{#contact.location}}
+      <div class="contact-line">📍 {{contact.location}}</div>
+      {{/contact.location}}
     </div>
-    <div style="color: #d32f2f; margin: 2px 0;">{{school}}{{#location}} • {{location}}{{/location}}</div>
-    {{#description}}
-    <div style="margin-top: 4px; font-size: 13px;">{{description}}</div>
-    {{/description}}
   </div>
-  {{/.}}
-  {{/education.education}}
 
-  <!-- Skills -->
-  {{#skills.skills}}
-  <div class="section-title">Compétences</div>
-  {{#.}}
-  <div style="margin-bottom: 8px;">
-    <strong style="color: #6aaf50;">{{category}}:</strong>
-    <span style="margin-left: 8px;">{{items}}</span>
+  <!-- Experience Section -->
+  {{#experiences}}
+  <div class="cv-section">
+    <div class="section-title">~/cv/experience: cat experience.txt</div>
+    <div class="terminal-box">
+      <div class="prompt">{{header.prompt}}</div>
+      {{#.}}
+      <div class="experience-item">
+        <div class="experience-header">
+          <span class="experience-period">[{{period}}]</span> ▶
+          <span class="experience-company">{{company}}</span> –
+          <span>{{position}}</span>
+        </div>
+        {{#description}}
+        <div class="experience-description">{{description}}</div>
+        {{/description}}
+        {{#achievements}}
+        <div class="experience-achievements">{{{achievements}}}</div>
+        {{/achievements}}
+      </div>
+      <hr class="separator">
+      {{/.}}
+    </div>
   </div>
-  {{/.}}
-  {{/skills.skills}}
+  {{/experiences}}
 
-  <!-- Languages -->
-  {{#languages.languages}}
-  <div class="section-title">Langues</div>
-  <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
-    {{#.}}
-    <div><strong>{{language}}:</strong> {{level}}</div>
-    {{/.}}
+  <!-- Skills Section -->
+  {{#skills.technical}}
+  <div class="cv-section">
+    <div class="section-title">~/cv/skills: cat tech-skills.txt</div>
+    <div class="terminal-box">
+      <div class="prompt">{{header.prompt}}</div>
+      <div class="skills-grid">
+        {{{skills.technical}}}
+      </div>
+    </div>
   </div>
-  {{/languages.languages}}
+  {{/skills.technical}}
+
+  <!-- Education Section -->
+  {{#education}}
+  <div class="cv-section">
+    <div class="section-title">~/cv/formation: tree</div>
+    <div class="terminal-box">
+      <div class="prompt">{{header.prompt}}</div>
+      <div class="education-tree">
+        .
+        {{#.}}
+        <div class="education-item">
+          <span class="tree-branch">├──</span>
+          <strong>{{degree}}</strong> {{institution}}
+          <span class="education-year">{{year}}</span>
+        </div>
+        {{/.}}
+      </div>
+    </div>
+  </div>
+  {{/education}}
+
+  <!-- Languages Section -->
+  {{#languages}}
+  <div class="cv-section">
+    <div class="section-title">~/cv/langues: cat langues.txt</div>
+    <div class="terminal-box">
+      <div class="prompt">{{header.prompt}}</div>
+      {{#.}}
+      <div class="language-item">
+        <span class="flag">🌐</span>
+        <strong>{{name}}</strong> : {{level}}
+      </div>
+      {{/.}}
+    </div>
+  </div>
+  {{/languages}}
+
+  <!-- Footer Section -->
+  {{#footer.website}}
+  <div class="cv-section cv-footer">
+    <div class="section-title">~/cv: cat signature.txt</div>
+    <div class="terminal-box">
+      <div class="prompt">{{header.prompt}}</div>
+      <a href="{{footer.website}}" target="_blank">{{footer.website}}</a>
+      {{#footer.github}}
+      <br><a href="{{footer.github}}" target="_blank">{{footer.github}}</a>
+      {{/footer.github}}
+    </div>
+  </div>
+  {{/footer.website}}
 </div>`,
   isDefault: true,
   createdAt: Date.now(),
