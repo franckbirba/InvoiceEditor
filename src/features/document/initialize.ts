@@ -8,16 +8,7 @@ import {
   getDocuments,
   saveDocument as saveNewDocument,
 } from './document.storage';
-import {
-  defaultFactureType,
-  defaultFactureTemplate,
-  defaultFactureTheme,
-} from './defaults/facture.default';
-import {
-  defaultCVType,
-  defaultCVTemplate,
-  defaultCVTheme,
-} from './defaults/cv.default';
+import { loadDefaults } from './defaults/defaults-loader';
 import {
   needsMigration,
   getLegacyDocuments,
@@ -34,6 +25,12 @@ export function initializeDocumentSystem(): {
 } {
   let migrated = false;
   let documentCount = 0;
+
+  // Load all defaults from centralized loader
+  const { documentTypes, templates, themes } = loadDefaults();
+  const [defaultFactureType, defaultCVType] = documentTypes;
+  const [defaultFactureTemplate, defaultCVTemplate] = templates;
+  const [defaultFactureTheme, defaultCVTheme] = themes;
 
   // Check if document types exist
   const existingTypes = getDocumentTypes();

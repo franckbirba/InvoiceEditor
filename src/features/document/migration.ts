@@ -1,6 +1,5 @@
 import type { InvoiceData } from '../invoice/invoice.schema';
 import type { Document } from './document.schema';
-import { defaultFactureType } from './defaults/facture.default';
 
 /**
  * Migration utility to convert old invoice data to new Document format
@@ -24,8 +23,8 @@ export interface LegacyInvoiceDocument {
  */
 export function migrateInvoiceToDocument(
   legacy: LegacyInvoiceDocument,
-  templateId: string = 'facture-cv-default',
-  themeId: string = 'theme-cv-default'
+  templateId: string = 'facture-terminal-default',
+  themeId: string = 'theme-terminal-default'
 ): Document {
   const { id, data, metadata } = legacy;
 
@@ -57,7 +56,7 @@ export function migrateInvoiceToDocument(
 
   return {
     id,
-    typeId: defaultFactureType.id,
+    typeId: 'facture', // Use the facture document type ID directly
     name: metadata.name || `Facture ${data.invoice.number}`,
     data: documentData,
     templateId,

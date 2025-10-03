@@ -1,0 +1,235 @@
+{
+  "documentTypes": [
+    {
+      "id": "facture",
+      "name": "Facture",
+      "icon": "FileText",
+      "description": "Document de facturation professionnel",
+      "sections": [
+        {
+          "id": "sender",
+          "name": "Émetteur",
+          "fields": [
+            { "id": "name", "name": "Nom", "type": "text", "required": true },
+            { "id": "address", "name": "Adresse", "type": "textarea", "required": false },
+            { "id": "email", "name": "Email", "type": "email", "required": false },
+            { "id": "phone", "name": "Téléphone", "type": "tel", "required": false },
+            { "id": "bank", "name": "Coordonnées bancaires", "type": "textarea", "required": false },
+            { "id": "logo", "name": "Logo", "type": "text", "required": false },
+            { "id": "notes", "name": "Notes", "type": "textarea", "required": false }
+          ]
+        },
+        {
+          "id": "client",
+          "name": "Client",
+          "fields": [
+            { "id": "name", "name": "Nom", "type": "text", "required": true },
+            { "id": "address", "name": "Adresse", "type": "textarea", "required": false },
+            { "id": "email", "name": "Email", "type": "email", "required": false },
+            { "id": "phone", "name": "Téléphone", "type": "tel", "required": false },
+            { "id": "bank", "name": "Coordonnées bancaires", "type": "textarea", "required": false },
+            { "id": "reg", "name": "RCCM/IFU", "type": "text", "required": false },
+            { "id": "notes", "name": "Notes", "type": "textarea", "required": false }
+          ]
+        },
+        {
+          "id": "invoice",
+          "name": "Facture",
+          "fields": [
+            { "id": "number", "name": "Numéro", "type": "text", "required": true },
+            { "id": "date", "name": "Date", "type": "date", "required": true },
+            { "id": "subject", "name": "Objet", "type": "text", "required": false },
+            { "id": "payment_terms", "name": "Conditions de paiement", "type": "text", "required": false },
+            { "id": "currency", "name": "Devise", "type": "text", "required": false, "defaultValue": "XOF" }
+          ]
+        },
+        {
+          "id": "items",
+          "name": "Prestations",
+          "fields": [
+            {
+              "id": "items",
+              "name": "Lignes",
+              "type": "array",
+              "required": true,
+              "itemSchema": [
+                { "id": "description", "name": "Désignation", "type": "text", "required": true },
+                { "id": "qty", "name": "Quantité", "type": "number", "required": true },
+                { "id": "unit_price", "name": "Prix unitaire", "type": "number", "required": true },
+                { "id": "discount", "name": "Remise (%)", "type": "number", "required": false }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "summary",
+          "name": "Récapitulatif",
+          "fields": [
+            { "id": "global_discount", "name": "Remise globale (%)", "type": "number", "required": false },
+            {
+              "id": "taxes",
+              "name": "Taxes",
+              "type": "array",
+              "required": false,
+              "itemSchema": [
+                { "id": "label", "name": "Label", "type": "text", "required": true },
+                { "id": "rate", "name": "Taux (%)", "type": "number", "required": true }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "footer",
+          "name": "Pied de page",
+          "fields": [
+            { "id": "legal", "name": "Mentions légales", "type": "textarea", "required": false },
+            { "id": "signature", "name": "Signature", "type": "text", "required": false }
+          ]
+        }
+      ],
+      "createdAt": 0,
+      "updatedAt": 0
+    },
+    {
+      "id": "cv",
+      "name": "CV",
+      "icon": "User",
+      "description": "Curriculum Vitae professionnel",
+      "sections": [
+        {
+          "id": "personal",
+          "name": "Informations personnelles",
+          "fields": [
+            { "id": "name", "name": "Nom complet", "type": "text", "required": true },
+            { "id": "title", "name": "Titre/Poste", "type": "text", "required": false },
+            { "id": "email", "name": "Email", "type": "email", "required": false },
+            { "id": "phone", "name": "Téléphone", "type": "tel", "required": false },
+            { "id": "address", "name": "Adresse", "type": "textarea", "required": false },
+            { "id": "website", "name": "Site web", "type": "url", "required": false },
+            { "id": "linkedin", "name": "LinkedIn", "type": "url", "required": false },
+            { "id": "github", "name": "GitHub", "type": "url", "required": false }
+          ]
+        },
+        {
+          "id": "summary",
+          "name": "Résumé professionnel",
+          "fields": [
+            { "id": "summary", "name": "Résumé", "type": "textarea", "required": false }
+          ]
+        },
+        {
+          "id": "experience",
+          "name": "Expérience professionnelle",
+          "fields": [
+            {
+              "id": "experiences",
+              "name": "Expériences",
+              "type": "array",
+              "required": false,
+              "itemSchema": [
+                { "id": "position", "name": "Poste", "type": "text", "required": true },
+                { "id": "company", "name": "Entreprise", "type": "text", "required": true },
+                { "id": "location", "name": "Lieu", "type": "text", "required": false },
+                { "id": "start_date", "name": "Date début", "type": "date", "required": false },
+                { "id": "end_date", "name": "Date fin", "type": "date", "required": false },
+                { "id": "current", "name": "Poste actuel", "type": "text", "required": false },
+                { "id": "description", "name": "Description", "type": "textarea", "required": false }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "education",
+          "name": "Formation",
+          "fields": [
+            {
+              "id": "education",
+              "name": "Formations",
+              "type": "array",
+              "required": false,
+              "itemSchema": [
+                { "id": "degree", "name": "Diplôme", "type": "text", "required": true },
+                { "id": "school", "name": "École", "type": "text", "required": true },
+                { "id": "location", "name": "Lieu", "type": "text", "required": false },
+                { "id": "year", "name": "Année", "type": "text", "required": false },
+                { "id": "description", "name": "Description", "type": "textarea", "required": false }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "skills",
+          "name": "Compétences",
+          "fields": [
+            {
+              "id": "skills",
+              "name": "Compétences par catégorie",
+              "type": "array",
+              "required": false,
+              "itemSchema": [
+                { "id": "category", "name": "Catégorie", "type": "text", "required": true },
+                { "id": "items", "name": "Compétences (séparées par virgules, utilisez * pour importance)", "type": "text", "required": true }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "languages",
+          "name": "Langues",
+          "fields": [
+            {
+              "id": "languages",
+              "name": "Langues",
+              "type": "array",
+              "required": false,
+              "itemSchema": [
+                { "id": "language", "name": "Langue", "type": "text", "required": true },
+                { "id": "level", "name": "Niveau", "type": "text", "required": true }
+              ]
+            }
+          ]
+        }
+      ],
+      "createdAt": 0,
+      "updatedAt": 0
+    }
+  ],
+  "templates": [
+    {
+      "id": "facture-terminal-default",
+      "name": "Template Facture Terminal",
+      "typeId": "facture",
+      "content": "<div class=\"invoice-preview\" id=\"invoice-content\">\n  <div class=\"invoice-header\">\n    <div class=\"invoice-title\">FACTURE</div>\n    <div class=\"header-separator\"></div>\n    <div class=\"invoice-meta\">\n      <div><strong>N°</strong> <span data-field=\"invoice.number\">{{invoice.number}}</span></div>\n      <div style=\"font-size: 14px; color: #666;\"><span data-field=\"sender.name\">{{sender.name}}</span></div>\n      <div><strong>DATE:</strong> <span data-field=\"invoice.date\">{{formatted.date}}</span></div>\n    </div>\n    <div class=\"header-separator\"></div>\n  </div>\n\n  <div style=\"display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0;\">\n    <div>\n      <div class=\"section-title\">Émetteur</div>\n      <div class=\"info-box\" style=\"margin-bottom: 0;\">\n        <strong><span data-field=\"sender.name\">{{sender.name}}</span></strong><br>\n        {{#sender.address}}<span data-field=\"sender.address\">{{sender.address}}</span><br>{{/sender.address}}\n        {{#sender.email}}📧 <span data-field=\"sender.email\">{{sender.email}}</span><br>{{/sender.email}}\n        {{#sender.phone}}📱 <span data-field=\"sender.phone\">{{sender.phone}}</span><br>{{/sender.phone}}\n        {{#sender.bank}}<span data-field=\"sender.bank\">{{sender.bank}}</span><br>{{/sender.bank}}\n        {{#sender.notes}}<em><span data-field=\"sender.notes\">{{sender.notes}}</span></em>{{/sender.notes}}\n      </div>\n    </div>\n    <div>\n      <div class=\"section-title\">Client</div>\n      <div class=\"info-box\" style=\"margin-bottom: 0;\">\n        <strong><span data-field=\"client.name\">{{client.name}}</span></strong><br>\n        {{#client.address}}<span data-field=\"client.address\">{{client.address}}</span><br>{{/client.address}}\n        {{#client.email}}📧 <span data-field=\"client.email\">{{client.email}}</span><br>{{/client.email}}\n        {{#client.phone}}📱 <span data-field=\"client.phone\">{{client.phone}}</span><br>{{/client.phone}}\n        {{#client.bank}}<span data-field=\"client.bank\">{{client.bank}}</span><br>{{/client.bank}}\n        {{#client.reg}}<span data-field=\"client.reg\">{{client.reg}}</span><br>{{/client.reg}}\n        {{#client.notes}}<em><span data-field=\"client.notes\">{{client.notes}}</span></em>{{/client.notes}}\n      </div>\n    </div>\n  </div>\n\n  {{#invoice.subject}}\n  <div class=\"section-title\" style=\"margin-top: 8px;\">Objet</div>\n  <div class=\"highlight-box\"><span data-field=\"invoice.subject\">{{invoice.subject}}</span></div>\n  {{/invoice.subject}}\n\n  <div class=\"section-title\">Prestations</div>\n  <div class=\"table-wrapper\">\n    <table class=\"invoice-table\">\n      <thead>\n        <tr>\n          <th>DÉSIGNATION</th>\n          <th style=\"text-align: center;\">QTÉ</th>\n          <th style=\"text-align: right;\">P.U.</th>\n          <th style=\"text-align: right;\">REMISE</th>\n          <th style=\"text-align: right;\">TOTAL</th>\n        </tr>\n      </thead>\n      <tbody>\n        {{#items_with_totals}}\n        <tr data-item-index=\"{{index}}\">\n          <td><span data-field=\"items.{{index}}.description\">{{description}}</span></td>\n          <td style=\"text-align: center;\"><span data-field=\"items.{{index}}.qty\">{{qty_formatted}}</span></td>\n          <td class=\"text-right\"><span data-field=\"items.{{index}}.unit_price\">{{unit_price_formatted}}</span></td>\n          <td class=\"text-right\"><span data-field=\"items.{{index}}.discount\">{{discount}}</span>%</td>\n          <td class=\"text-right\"><strong>{{line_total_formatted}}</strong></td>\n        </tr>\n        {{/items_with_totals}}\n      </tbody>\n    </table>\n  </div>\n\n  <div class=\"section-title\">Récapitulatif</div>\n  <div class=\"summary-section\">\n    <div class=\"summary-row\">\n      <span>Sous-total:</span>\n      <span>{{formatted.subtotal}}</span>\n    </div>\n    {{#totals.taxes}}\n    <div class=\"summary-row\" data-tax-index=\"{{index}}\">\n      <span><span data-field=\"summary.taxes.{{index}}.label\">{{label}}</span> (<span data-field=\"summary.taxes.{{index}}.rate\">{{rate}}</span>%):</span>\n      <span>{{amount}}</span>\n    </div>\n    {{/totals.taxes}}\n    <div class=\"summary-row total\">\n      <span>TOTAL</span>\n      <span>{{formatted.total}}</span>\n    </div>\n  </div>\n\n  {{#invoice.payment_terms}}\n  <div class=\"section-title\">Conditions de paiement</div>\n  <div class=\"highlight-box\"><span data-field=\"invoice.payment_terms\">{{invoice.payment_terms}}</span></div>\n  {{/invoice.payment_terms}}\n\n  <div class=\"footer-section\">\n    {{#footer.legal}}<span data-field=\"footer.legal\">{{footer.legal}}</span>{{/footer.legal}}\n  </div>\n</div>",
+      "isDefault": true,
+      "createdAt": 0,
+      "updatedAt": 0
+    },
+    {
+      "id": "cv-terminal-default",
+      "name": "Template CV Terminal",
+      "typeId": "cv",
+      "content": "<div class=\"cv-preview\" id=\"cv-content\">\n  <!-- Header with double line separator -->\n  <div class=\"cv-header\">\n    <div class=\"double-separator\"></div>\n    <h1 class=\"cv-title\"><span data-field=\"header.name\">{{header.name}}</span></h1>\n    <div class=\"cv-subtitle\"><span data-field=\"header.title\">{{header.title}}</span></div>\n    <div class=\"double-separator\"></div>\n  </div>\n\n  <!-- Identity Section -->\n  {{#identity.summary}}\n  <div class=\"cv-section\">\n    <div class=\"section-title\">~/cv/identity: <span class=\"command\">whoami</span></div>\n    <div class=\"content-box\">\n      <div class=\"section-content\"><span data-field=\"identity.summary\">{{identity.summary}}</span></div>\n    </div>\n  </div>\n  {{/identity.summary}}\n\n  <!-- Contact Section -->\n  <div class=\"cv-section\">\n    <div class=\"section-title\">~/cv/contact: <span class=\"command\">cat contact.txt</span></div>\n    <div class=\"content-box\">\n      {{#contact.email}}\n      <div class=\"contact-line\">📧 <span data-field=\"contact.email\">{{contact.email}}</span></div>\n      {{/contact.email}}\n      {{#contact.phone}}\n      <div class=\"contact-line\">📱 <span data-field=\"contact.phone\">{{contact.phone}}</span></div>\n      {{/contact.phone}}\n      {{#contact.location}}\n      <div class=\"contact-line\">📍 <span data-field=\"contact.location\">{{contact.location}}</span></div>\n      {{/contact.location}}\n    </div>\n  </div>\n\n  <!-- Experience Section -->\n  <div class=\"cv-section\">\n    <div class=\"section-title\">~/cv/experience: <span class=\"command\">cat experience.txt</span></div>\n    <div class=\"content-box\">\n      {{#experiences}}\n      <div class=\"experience-item\" data-item-index=\"{{index}}\">\n        <div class=\"experience-header\">\n          <span class=\"experience-period\">[<span data-field=\"experiences.{{index}}.period\">{{period}}</span>]</span> <span class=\"arrow\">▶</span> <strong><span data-field=\"experiences.{{index}}.company\">{{company}}</span></strong> – <span data-field=\"experiences.{{index}}.position\">{{position}}</span>\n        </div>\n        {{#description}}\n        <div class=\"experience-description\"><span data-field=\"experiences.{{index}}.description\">{{description}}</span></div>\n        {{/description}}\n        {{#achievements}}\n        <div class=\"experience-achievements\"><span data-field=\"experiences.{{index}}.achievements\">{{{achievements}}}</span></div>\n        {{/achievements}}\n      </div>\n      {{/experiences}}\n    </div>\n  </div>\n\n  <!-- Skills Section -->\n  <div class=\"cv-section\">\n    <div class=\"section-title\">~/cv/skills: <span class=\"command\">cat tech-skills.txt</span></div>\n    <div class=\"content-box skills-section\" data-array-container=\"skills\">\n      {{#skills}}\n      <div class=\"skill-category\" data-item-index=\"{{index}}\">\n        <strong><span data-field=\"skills.{{index}}.category\">{{category}}</span>:</strong> <span class=\"skill-items\" data-field=\"skills.{{index}}.items\">{{items}}</span>\n      </div>\n      {{/skills}}\n    </div>\n  </div>\n\n  <!-- Education Section -->\n  <div class=\"cv-section\">\n    <div class=\"section-title\">~/cv/formation: <span class=\"command\">tree</span></div>\n    <div class=\"content-box\">\n      <div class=\"education-tree\">\n        .\n        {{#education}}\n        <div class=\"education-item\" data-item-index=\"{{index}}\">\n          <span class=\"tree-branch\">├──</span> <strong><span data-field=\"education.{{index}}.degree\">{{degree}}</span></strong> <span data-field=\"education.{{index}}.institution\">{{institution}}</span> <span class=\"education-year\"><span data-field=\"education.{{index}}.year\">{{year}}</span></span>\n        </div>\n        {{/education}}\n      </div>\n    </div>\n  </div>\n\n  <!-- Languages Section -->\n  <div class=\"cv-section\">\n    <div class=\"section-title\">~/cv/langues: <span class=\"command\">cat langues.txt</span></div>\n    <div class=\"content-box\">\n      {{#languages}}\n      <div class=\"language-item\" data-item-index=\"{{index}}\">\n        🌐 <strong><span data-field=\"languages.{{index}}.name\">{{name}}</span></strong> : <span data-field=\"languages.{{index}}.level\">{{level}}</span>\n      </div>\n      {{/languages}}\n    </div>\n  </div>\n\n  <!-- Footer Section -->\n  <div class=\"cv-section\">\n    <div class=\"section-title\">~/cv: <span class=\"command\">cat signature.txt</span></div>\n    <div class=\"content-box\">\n      <div class=\"footer-content\">\n        {{#footer.website}}\n        <span data-field=\"footer.website\">{{footer.website}}</span>\n        {{/footer.website}}\n        {{#footer.github}}\n        <br><span data-field=\"footer.github\">{{footer.github}}</span>\n        {{/footer.github}}\n      </div>\n    </div>\n  </div>\n</div>",
+      "isDefault": true,
+      "createdAt": 0,
+      "updatedAt": 0
+    }
+  ],
+  "themes": [
+    {
+      "id": "theme-terminal-default",
+      "name": "Thème Terminal",
+      "content": ":root {\n  /* Colors - CV Theme */\n  --color-bg: #f5f5f5;\n  --color-fg: #333333;\n  --color-muted: #666666;\n  --color-accent: #6aaf50;\n  --color-red: #d32f2f;\n  --color-border: #dddddd;\n  --color-box: #e8e8e8;\n  --chip-bg: #e8e8e8;\n  --chip-fg: #333333;\n\n  /* Typography - Monospace */\n  --font-mono: 'Courier New', monospace;\n  --h1: 24px;\n  --h2: 13px;\n  --text: 13px;\n  --mono: 13px;\n  --tracking: 2px;\n\n  /* Layout */\n  --page-w: 794px;\n  --page-pad: 32px;\n  --radius: 4px;\n  --gap: 16px;\n  --line: 1px;\n  --band: 1px;\n}\n\n/* Invoice Preview Styles */\n.invoice-preview {\n  max-width: var(--page-w);\n  margin: 0 auto;\n  padding: var(--page-pad);\n  background: white;\n  color: var(--color-fg);\n  font-family: var(--font-mono);\n  font-size: var(--text);\n  line-height: 1.8;\n}\n\n.invoice-header {\n  margin-bottom: 12px;\n  text-align: center;\n}\n\n.invoice-title {\n  font-size: var(--h1);\n  font-weight: bold;\n  letter-spacing: var(--tracking);\n  text-transform: uppercase;\n  margin: 0;\n  color: var(--color-fg);\n}\n\n.invoice-meta {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  font-size: var(--h2);\n  color: var(--color-fg);\n  margin: 8px 0;\n}\n\n.invoice-meta strong {\n  color: var(--color-red);\n}\n\n.section-title {\n  color: var(--color-fg);\n  font-size: var(--h2);\n  margin: 0 0 6px 0;\n  font-weight: bold;\n  text-transform: uppercase;\n  letter-spacing: 1px;\n}\n\n.info-box {\n  padding: 12px;\n  margin-bottom: 12px;\n  font-size: var(--text);\n  line-height: 1.6;\n}\n\n.info-box strong {\n  color: var(--color-red);\n}\n\n.highlight-box {\n  padding: 10px 12px;\n  margin: 12px 0;\n  border-left: 2px solid var(--color-accent);\n  font-size: var(--text);\n}\n\n.header-separator {\n  border-top: var(--band) solid var(--color-accent);\n  margin: 8px 0;\n}\n\n.table-wrapper {\n  padding: 12px;\n  margin: 16px 0;\n}\n\n.invoice-table {\n  width: 100%;\n  border-collapse: collapse;\n  margin: 0;\n  font-size: 12px;\n}\n\n.invoice-table thead th {\n  text-align: left;\n  font-size: 11px;\n  font-weight: bold;\n  text-transform: uppercase;\n  padding: 8px 6px;\n  border-bottom: var(--band) solid var(--color-accent);\n  background: transparent;\n}\n\n.invoice-table tbody tr {\n  border-bottom: var(--line) solid var(--color-border);\n}\n\n.invoice-table tbody tr:last-child {\n  border-bottom: none;\n}\n\n.invoice-table td {\n  padding: 6px;\n  vertical-align: top;\n}\n\n.invoice-table td.text-right {\n  text-align: right;\n}\n\n.summary-section {\n  padding: 12px;\n  margin: 16px 0;\n  font-size: var(--text);\n}\n\n.summary-row {\n  display: flex;\n  justify-content: space-between;\n  padding: 6px 0;\n  border-bottom: var(--line) solid var(--color-border);\n}\n\n.summary-row:has(+ .summary-row.total) {\n  border-bottom: none;\n}\n\n.summary-row.total {\n  font-size: 15px;\n  font-weight: bold;\n  border-top: var(--band) solid var(--color-accent);\n  border-bottom: var(--band) solid var(--color-accent);\n  margin-top: 6px;\n  padding-top: 10px;\n}\n\n.footer-section {\n  margin-top: 24px;\n  font-size: 12px;\n  color: var(--color-muted);\n}",
+      "isDefault": true,
+      "createdAt": 0,
+      "updatedAt": 0
+    },
+    {
+      "id": "theme-cv-default",
+      "name": "Thème CV Terminal",
+      "content": ":root {\n  /* Colors matching the Facture theme */\n  --color-bg: #ffffff;\n  --color-fg: #333333;\n  --color-box-bg: #f0f0f0;\n  --color-green: #6aaf50;\n  --color-red: #d32f2f;\n  --color-blue: #2980b9;\n  --color-orange: #e67e22;\n  --color-border: #333333;\n\n  /* Typography - Monospace */\n  --font-mono: 'Courier New', monospace;\n  --h1: 18pt;\n  --h2: 11pt;\n  --text: 10pt;\n\n  /* Layout */\n  --page-w: 794px;\n  --page-pad: 40px;\n  --gap: 15px;\n}\n\n/* CV Preview Container */\n.cv-preview {\n  max-width: var(--page-w);\n  margin: 0 auto;\n  padding: var(--page-pad);\n  background: white;\n  color: var(--color-fg);\n  font-family: var(--font-mono);\n  font-size: var(--text);\n  line-height: 1.5;\n}\n\n/* Header */\n.cv-header {\n  text-align: center;\n  margin-bottom: 30px;\n}\n\n.double-separator {\n  border-top: 3px double var(--color-green);\n  margin: 10px 0;\n}\n\n.cv-title {\n  font-size: var(--h1);\n  font-weight: bold;\n  margin: 15px 0 5px 0;\n  color: var(--color-fg);\n  letter-spacing: 1px;\n}\n\n.cv-subtitle {\n  font-size: var(--h2);\n  color: var(--color-fg);\n  margin: 5px 0 15px 0;\n  letter-spacing: 0.5px;\n}\n\n/* Sections */\n.cv-section {\n  margin-bottom: 20px;\n  page-break-inside: avoid;\n}\n\n.section-title {\n  font-size: var(--text);\n  font-weight: bold;\n  margin-bottom: 8px;\n}\n\n/* Prompt part in green */\n.section-title {\n  color: var(--color-green);\n}\n\n/* Command part in gray */\nspan.command {\n  color: #666666 !important;\n  font-weight: normal !important;\n}\n\n.section-title span.command {\n  color: #666666 !important;\n  font-weight: normal !important;\n}\n\n.content-box {\n  background-color: var(--color-box-bg);\n  padding: 15px;\n  margin-bottom: 5px;\n}\n\n.section-content {\n  white-space: pre-line;\n  line-height: 1.6;\n}\n\n/* Contact */\n.contact-line {\n  margin-bottom: 2px;\n  line-height: 1.4;\n}\n\n/* Experience */\n.experience-item {\n  margin-bottom: 15px;\n}\n\n.experience-item:last-child {\n  margin-bottom: 0;\n}\n\n.experience-header {\n  margin-bottom: 5px;\n  line-height: 1.4;\n}\n\n.experience-period {\n  color: var(--color-red);\n  font-weight: bold;\n}\n\n.arrow {\n  color: var(--color-fg);\n}\n\n.experience-description {\n  margin-top: 5px;\n  margin-left: 0;\n  white-space: pre-line;\n  line-height: 1.5;\n}\n\n.experience-achievements {\n  margin-top: 5px;\n  margin-left: 0;\n  white-space: pre-line;\n  line-height: 1.5;\n}\n\n/* Skills */\n.skill-category {\n  margin-bottom: 8px;\n  line-height: 1.6;\n}\n\n.skill-items {\n  font-weight: normal;\n}\n\n.skill-item {\n  display: inline;\n}\n\n/* Education */\n.education-tree {\n  margin-left: 0;\n  line-height: 1.6;\n}\n\n.education-item {\n  margin-bottom: 3px;\n}\n\n.tree-branch {\n  color: var(--color-fg);\n  margin-right: 5px;\n}\n\n.education-year {\n  color: var(--color-red);\n  font-weight: bold;\n}\n\n/* Languages */\n.language-item {\n  margin-bottom: 5px;\n  line-height: 1.5;\n}\n\n/* Footer */\n.footer-content {\n  text-align: center;\n  line-height: 1.6;\n}\n\n.footer-content a {\n  color: var(--color-blue);\n  text-decoration: underline;\n}\n\n/* Print styles */\n@media print {\n  .cv-preview {\n    padding: 20px;\n    max-width: 100%;\n  }\n\n  .content-box {\n    break-inside: avoid;\n  }\n}\n\n@page {\n  margin: 15mm;\n  size: A4;\n}",
+      "isDefault": true,
+      "createdAt": 0,
+      "updatedAt": 0
+    }
+  ]
+}
