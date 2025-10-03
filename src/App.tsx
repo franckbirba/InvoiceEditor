@@ -3,8 +3,10 @@ import { useInvoiceStore } from './features/invoice/useInvoiceStore';
 import { Topbar } from './components/Topbar';
 import { SidebarForm } from './components/SidebarForm';
 import { InvoicePreview } from './components/InvoicePreview';
+import { InvoicePreviewEditable } from './components/InvoicePreviewEditable';
 import { TemplateEditor } from './components/TemplateEditor';
 import { ToastProvider } from './components/Toast';
+import { initializeDocumentSystem } from './features/document/initialize';
 import './lib/i18n';
 
 const SIDEBAR_WIDTH_KEY = 'invoice-studio-sidebar-width';
@@ -14,12 +16,21 @@ const MAX_SIDEBAR_WIDTH = 600;
 
 function App() {
   const isEditorMode = useInvoiceStore((state) => state.isEditorMode);
+  const isInlineEditMode = useInvoiceStore((state) => state.isInlineEditMode);
   const [sidebarWidth, setSidebarWidth] = useState(() => {
     const saved = localStorage.getItem(SIDEBAR_WIDTH_KEY);
     return saved ? parseInt(saved, 10) : DEFAULT_SIDEBAR_WIDTH;
   });
   const [isResizing, setIsResizing] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
+
+  // Initialize document system on first load
+  useEffect(() => {
+    const result = initializeDocumentSystem();
+    if (result.migrated) {
+      console.log(`Migrated ${result.documentCount} documents to new format`);
+    }
+  }, []);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -92,29 +103,37 @@ function App() {
         <Topbar />
 
         <div className="flex-1 flex overflow-hidden min-h-0">
-          {/* Sidebar Form */}
-          <aside
-            ref={sidebarRef}
-            style={{ width: `${sidebarWidth}px` }}
-            className="flex-shrink-0 bg-white border-r border-gray-200 overflow-y-auto no-print relative"
-          >
-            <SidebarForm />
-
-            {/* Resize Handle */}
-            <div
-              className="absolute top-0 right-0 w-1 h-full cursor-ew-resize hover:bg-blue-500 transition-colors group"
-              onMouseDown={(e) => {
-                e.preventDefault();
-                setIsResizing(true);
-              }}
+          {/* Sidebar Form - Hidden in inline edit mode */}
+          {!isInlineEditMode && (
+            <aside
+              ref={sidebarRef}
+              style={{ width: `${sidebarWidth}px` }}
+              className="flex-shrink-0 bg-white border-r border-gray-200 overflow-y-auto no-print relative"
             >
-              <div className="absolute top-1/2 right-0 -translate-y-1/2 w-1 h-12 bg-gray-300 group-hover:bg-blue-500 transition-colors rounded-l" />
-            </div>
-          </aside>
+              <SidebarForm />
+
+              {/* Resize Handle */}
+              <div
+                className="absolute top-0 right-0 w-1 h-full cursor-ew-resize hover:bg-blue-500 transition-colors group"
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  setIsResizing(true);
+                }}
+              >
+                <div className="absolute top-1/2 right-0 -translate-y-1/2 w-1 h-12 bg-gray-300 group-hover:bg-blue-500 transition-colors rounded-l" />
+              </div>
+            </aside>
+          )}
 
           {/* Main Content */}
           <main className="flex-1 overflow-y-auto p-8 min-w-0">
-            {isEditorMode ? <TemplateEditor /> : <InvoicePreview />}
+            {isEditorMode ? (
+              <TemplateEditor />
+            ) : isInlineEditMode ? (
+              <InvoicePreviewEditable />
+            ) : (
+              <InvoicePreview />
+            )}
           </main>
         </div>
       </div>

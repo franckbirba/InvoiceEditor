@@ -10,9 +10,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['fonts/*.woff2', 'assets/*.svg'],
       manifest: {
-        name: 'Invoice Studio',
-        short_name: 'Invoice Studio',
-        description: 'Offline-first invoice editor with CV theme',
+        name: 'Document Studio',
+        short_name: 'Document Studio',
+        description: 'Offline-first document editor for professionals',
         theme_color: '#2563eb',
         icons: [
           {

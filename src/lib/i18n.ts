@@ -5,7 +5,7 @@ import { loadFromLocalStorage, saveToLocalStorage, STORAGE_KEYS } from './storag
 const resources = {
   fr: {
     ui: {
-      appName: 'Invoice Studio',
+      appName: 'Document Studio',
       newInvoice: 'Nouvelle facture',
       duplicate: 'Dupliquer',
       import: 'Importer',
@@ -75,7 +75,7 @@ const resources = {
   },
   en: {
     ui: {
-      appName: 'Invoice Studio',
+      appName: 'Document Studio',
       newInvoice: 'New Invoice',
       duplicate: 'Duplicate',
       import: 'Import',

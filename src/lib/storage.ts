@@ -124,8 +124,49 @@ export function saveDocument(id: string, data: any, template: string, metadata: 
 
     saveDocumentsList(documents);
     setActiveDocumentId(id);
+
+    // SYNC: Also save to new document system
+    syncToNewDocumentSystem(id, data, template, metadata);
   } catch (error) {
     console.error('Failed to save document:', error);
+  }
+}
+
+// Synchronize with new document system
+function syncToNewDocumentSystem(id: string, data: any, _template: string, metadata: Omit<DocumentMetadata, 'id' | 'updatedAt'>): void {
+  try {
+    // Import dynamically to avoid circular dependency
+    import('../features/document/document.storage').then(({ saveDocument: saveNewDoc, getDocument }) => {
+      // Check if document already exists in new system
+      const existingDoc = getDocument(id);
+
+      const newDoc = {
+        id,
+        typeId: 'facture', // Assume facture for legacy documents
+        name: metadata.name,
+        data: {
+          version: data.version,
+          locale: data.locale,
+          theme: data.theme,
+          sender: data.sender,
+          client: data.client,
+          invoice: data.invoice,
+          items: data.items,
+          summary: data.summary,
+          footer: data.footer,
+        },
+        templateId: 'facture-cv-default',
+        themeId: 'theme-cv-default',
+        projectId: existingDoc?.projectId,
+        tags: existingDoc?.tags || [],
+        createdAt: existingDoc?.createdAt || metadata.createdAt,
+        updatedAt: Date.now(),
+      };
+
+      saveNewDoc(newDoc);
+    });
+  } catch (error) {
+    console.error('Failed to sync to new document system:', error);
   }
 }
 

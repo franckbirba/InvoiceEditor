@@ -13,6 +13,7 @@ interface InvoiceStore {
   data: InvoiceData;
   template: string;
   isEditorMode: boolean;
+  isInlineEditMode: boolean;
   dataVersion: number; // Incremented on external updates to trigger form reset
   activeDocumentId: string | null;
 
@@ -20,6 +21,7 @@ interface InvoiceStore {
   updateData: (updater: (data: InvoiceData) => InvoiceData) => void;
   setTemplate: (template: string) => void;
   toggleEditorMode: () => void;
+  toggleInlineEditMode: () => void;
   resetToSample: () => void;
   duplicateInvoice: () => void;
   loadFromJson: (json: string) => void;
@@ -166,6 +168,7 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => {
     data: initialData,
     template: initialTemplate,
     isEditorMode: false,
+    isInlineEditMode: false,
     dataVersion: 0,
     activeDocumentId: activeId,
 
@@ -187,7 +190,11 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => {
     },
 
     toggleEditorMode: () => {
-      set((state) => ({ isEditorMode: !state.isEditorMode }));
+      set((state) => ({ isEditorMode: !state.isEditorMode, isInlineEditMode: false }));
+    },
+
+    toggleInlineEditMode: () => {
+      set((state) => ({ isInlineEditMode: !state.isInlineEditMode, isEditorMode: false }));
     },
 
     resetToSample: () => {

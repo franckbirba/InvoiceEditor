@@ -1,32 +1,77 @@
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
-import { FileText, Copy, Download, Upload, Printer, Eye, Code, FolderOpen } from 'lucide-react';
+import { FileText, Copy, Download, Upload, Printer, Eye, Code, FolderOpen, User, Pencil } from 'lucide-react';
 import { useInvoiceStore } from '../features/invoice/useInvoiceStore';
 import { printInvoice } from '../lib/print';
 import { JsonImportExport } from './JsonImportExport';
 import { LanguageToggle } from './LanguageToggle';
 import { ThemeSwitcher } from './ThemeSwitcher';
-import { DocumentsDialog } from './DocumentsDialog';
+import { DocumentsNavigationDialog } from './DocumentsNavigationDialog';
 import { useToast } from './Toast';
+import { getDocumentTypes, getDocument } from '../features/document/document.storage';
+import type { Document } from '../features/document/document.schema';
 
 export function Topbar() {
   const { t } = useTranslation('ui');
   const { showToast } = useToast();
-  const { isEditorMode, toggleEditorMode, resetToSample, duplicateInvoice } = useInvoiceStore();
+  const { isEditorMode, toggleEditorMode, duplicateInvoice, activeDocumentId, isInlineEditMode, toggleInlineEditMode } = useInvoiceStore();
   const [showImportExport, setShowImportExport] = React.useState(false);
   const [showDocuments, setShowDocuments] = React.useState(false);
+  const [currentDocType, setCurrentDocType] = React.useState<string>('');
 
-  const handleNew = () => {
-    if (window.confirm(t('confirmReset'))) {
-      resetToSample();
-      showToast('success', 'Invoice reset', 'New invoice created from sample data');
+  React.useEffect(() => {
+    if (activeDocumentId) {
+      const doc = getDocument(activeDocumentId);
+      if (doc) {
+        const types = getDocumentTypes();
+        const type = types.find((t) => t.id === doc.typeId);
+        setCurrentDocType(type?.name || '');
+      }
     }
-  };
+  }, [activeDocumentId]);
 
   const handleDuplicate = () => {
     duplicateInvoice();
-    showToast('success', 'Invoice duplicated', 'A copy has been created with a new invoice number');
+    showToast('success', 'Document dupliqué', 'Une copie a été créée');
   };
+
+  const handleDocumentSelect = (doc: Document) => {
+    // Load the document - will be handled by the store
+    useInvoiceStore.getState().loadDocumentById(doc.id);
+  };
+
+  const handleNewDocument = (typeId: string, projectId?: string) => {
+    // Create new document of specific type
+    const types = getDocumentTypes();
+    const type = types.find((t) => t.id === typeId);
+    if (type) {
+      useInvoiceStore.getState().createDocument();
+
+      // If projectId is provided, assign document to project
+      if (projectId) {
+        // Get the newly created document and update it with projectId
+        import('../features/document/document.storage').then(({ getActiveDocumentId, getDocument, saveDocument }) => {
+          const docId = getActiveDocumentId();
+          if (docId) {
+            const doc = getDocument(docId);
+            if (doc) {
+              saveDocument({ ...doc, projectId });
+            }
+          }
+        });
+      }
+
+      showToast('success', 'Nouveau document', `Nouveau ${type.name} créé`);
+    }
+  };
+
+  const getDocTypeIcon = (typeName: string) => {
+    if (typeName.toLowerCase().includes('cv')) return User;
+    if (typeName.toLowerCase().includes('facture')) return FileText;
+    return FileText;
+  };
+
+  const DocIcon = getDocTypeIcon(currentDocType);
 
   const handlePrint = async () => {
     try {
@@ -44,11 +89,11 @@ export function Topbar() {
           {/* Left: Logo and Title */}
           <div className="flex items-center gap-3">
             <div className="p-2 bg-blue-600 rounded-lg">
-              <FileText className="w-5 h-5 text-white" />
+              <DocIcon className="w-5 h-5 text-white" />
             </div>
             <div>
               <h1 className="text-xl font-bold text-gray-900">{t('appName')}</h1>
-              <p className="text-xs text-gray-500">Professional Invoice Editor</p>
+              <p className="text-xs text-gray-500">{currentDocType || 'Document Editor'}</p>
             </div>
           </div>
 
@@ -56,20 +101,11 @@ export function Topbar() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowDocuments(true)}
-              className="flex items-center gap-2 px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-              title="Mes factures"
+              className="flex items-center gap-2 px-3 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              title="Mes documents"
             >
               <FolderOpen className="w-4 h-4" />
-              <span className="hidden sm:inline">Mes factures</span>
-            </button>
-
-            <button
-              onClick={handleNew}
-              className="flex items-center gap-2 px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-              title={t('newInvoice')}
-            >
-              <FileText className="w-4 h-4" />
-              <span className="hidden sm:inline">{t('newInvoice')}</span>
+              <span className="hidden sm:inline">Mes documents</span>
             </button>
 
             <button
@@ -105,6 +141,19 @@ export function Topbar() {
             <div className="w-px h-8 bg-gray-300 mx-2" />
 
             <button
+              onClick={() => toggleInlineEditMode?.()}
+              className={`flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors ${
+                isInlineEditMode
+                  ? 'bg-green-600 text-white hover:bg-green-700'
+                  : 'border border-gray-300 hover:bg-gray-50'
+              }`}
+              title={isInlineEditMode ? 'Mode lecture' : 'Édition inline'}
+            >
+              <Pencil className="w-4 h-4" />
+              <span className="hidden sm:inline">{isInlineEditMode ? 'Lecture' : 'Édition'}</span>
+            </button>
+
+            <button
               onClick={toggleEditorMode}
               className={`flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors ${
                 isEditorMode
@@ -136,7 +185,12 @@ export function Topbar() {
       </header>
 
       <JsonImportExport open={showImportExport} onOpenChange={setShowImportExport} />
-      <DocumentsDialog open={showDocuments} onOpenChange={setShowDocuments} />
+      <DocumentsNavigationDialog
+        open={showDocuments}
+        onOpenChange={setShowDocuments}
+        onDocumentSelect={handleDocumentSelect}
+        onNewDocument={handleNewDocument}
+      />
     </>
   );
 }
