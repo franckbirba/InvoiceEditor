@@ -516,6 +516,64 @@ Include all required CSS variables, print styles, and proper scoping.`;
           },
         },
         {
+          name: 'update_document_type',
+          description: 'Update an existing DocumentType based on modification requests. Preserves ID and structure while applying requested changes.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              currentJson: {
+                type: 'string',
+                description: 'JSON string of the current DocumentType to update',
+              },
+              updateRequest: {
+                type: 'string',
+                description: 'Natural language description of what to update (e.g., "Add a new section for payment terms")',
+              },
+            },
+            required: ['currentJson', 'updateRequest'],
+          },
+        },
+        {
+          name: 'update_template',
+          description: 'Update an existing Template based on modification requests. Maintains required data-* attributes while applying changes.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              currentJson: {
+                type: 'string',
+                description: 'JSON string of the current Template to update',
+              },
+              updateRequest: {
+                type: 'string',
+                description: 'Natural language description of what to update (e.g., "Make the header more prominent and add a footer")',
+              },
+              documentTypeJson: {
+                type: 'string',
+                description: 'Optional: JSON string of the DocumentType schema for reference',
+              },
+            },
+            required: ['currentJson', 'updateRequest'],
+          },
+        },
+        {
+          name: 'update_theme',
+          description: 'Update an existing Theme based on modification requests. Preserves required CSS variables while applying style changes.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              currentJson: {
+                type: 'string',
+                description: 'JSON string of the current Theme to update',
+              },
+              updateRequest: {
+                type: 'string',
+                description: 'Natural language description of what to update (e.g., "Change the accent color to green and use a sans-serif font")',
+              },
+            },
+            required: ['currentJson', 'updateRequest'],
+          },
+        },
+        {
           name: 'get_prompts',
           description: 'Get the complete prompt system documentation for reference. Useful for understanding how to structure DocumentTypes, Templates, and Themes.',
           inputSchema: {
@@ -731,6 +789,58 @@ Include all required CSS variables, print styles, and proper scoping.`;
               {
                 type: 'text',
                 text: `Use this system prompt to generate a CSS theme:\n\n${systemPrompt}\n\n${contextText}\n\nGenerate a valid CSS theme. The theme MUST include:\n- All required CSS variables in :root\n- @media print styles\n- @page rule for print setup\n- Proper scoping to .{typeId}-preview class\n\nReturn the theme as JSON with this structure:\n{\n  "id": "theme-id",\n  "name": "${themeName}",\n  "content": "CSS here",\n  "createdAt": ${Date.now()},\n  "updatedAt": ${Date.now()}\n}\n\nReturn ONLY the JSON, wrapped in a markdown code block.`,
+              },
+            ],
+          };
+        }
+
+        if (name === 'update_document_type') {
+          const { currentJson, updateRequest } = args as { currentJson: string; updateRequest: string };
+          const prompts = await this.loadPrompts();
+          const systemPrompt = this.buildDocumentTypePrompt(prompts);
+
+          const current = JSON.parse(currentJson);
+
+          return {
+            content: [
+              {
+                type: 'text',
+                text: `Use this system prompt to update a DocumentType:\n\n${systemPrompt}\n\nCurrent DocumentType:\n\`\`\`json\n${currentJson}\n\`\`\`\n\nUpdate request: ${updateRequest}\n\nIMPORTANT:\n- Preserve the existing ID: "${current.id}"\n- Keep createdAt: ${current.createdAt}\n- Update updatedAt to: ${Date.now()}\n- Maintain structure unless specifically asked to change it\n- Follow all DocumentType schema requirements\n\nReturn the complete updated DocumentType as JSON in a markdown code block.`,
+              },
+            ],
+          };
+        }
+
+        if (name === 'update_template') {
+          const { currentJson, updateRequest, documentTypeJson } = args as { currentJson: string; updateRequest: string; documentTypeJson?: string };
+          const prompts = await this.loadPrompts();
+          const systemPrompt = this.buildTemplatePrompt(prompts);
+
+          const current = JSON.parse(currentJson);
+          let contextText = documentTypeJson ? `\n\nDocumentType schema (for reference):\n\`\`\`json\n${documentTypeJson}\n\`\`\`` : '';
+
+          return {
+            content: [
+              {
+                type: 'text',
+                text: `Use this system prompt to update a Template:\n\n${systemPrompt}\n\nCurrent Template:\n\`\`\`json\n${currentJson}\n\`\`\`\n\nUpdate request: ${updateRequest}${contextText}\n\nIMPORTANT:\n- Preserve the existing ID: "${current.id}"\n- Keep typeId: "${current.typeId}"\n- Keep createdAt: ${current.createdAt}\n- Update updatedAt to: ${Date.now()}\n- Maintain ALL required data-* attributes\n- Follow all template requirements\n\nReturn the complete updated Template as JSON in a markdown code block.`,
+              },
+            ],
+          };
+        }
+
+        if (name === 'update_theme') {
+          const { currentJson, updateRequest } = args as { currentJson: string; updateRequest: string };
+          const prompts = await this.loadPrompts();
+          const systemPrompt = this.buildThemePrompt(prompts);
+
+          const current = JSON.parse(currentJson);
+
+          return {
+            content: [
+              {
+                type: 'text',
+                text: `Use this system prompt to update a Theme:\n\n${systemPrompt}\n\nCurrent Theme:\n\`\`\`json\n${currentJson}\n\`\`\`\n\nUpdate request: ${updateRequest}\n\nIMPORTANT:\n- Preserve the existing ID: "${current.id}"\n- Keep createdAt: ${current.createdAt}\n- Update updatedAt to: ${Date.now()}\n- Maintain ALL required CSS variables\n- Keep print styles and proper scoping\n- Follow all theme requirements\n\nReturn the complete updated Theme as JSON in a markdown code block.`,
               },
             ],
           };

@@ -19,6 +19,22 @@ export interface CreateThemeOptions {
   typeId?: string;
 }
 
+export interface UpdateDocumentTypeOptions {
+  current: DocumentType;
+  updateRequest: string;
+}
+
+export interface UpdateTemplateOptions {
+  current: Template;
+  updateRequest: string;
+  documentType?: DocumentType;
+}
+
+export interface UpdateThemeOptions {
+  current: Theme;
+  updateRequest: string;
+}
+
 /**
  * Document Studio LLM Service
  * High-level API for generating document types, templates, and themes using LLMs
@@ -153,6 +169,125 @@ Return the theme as JSON with this structure:
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error creating theme',
+      };
+    }
+  }
+
+  /**
+   * Update an existing DocumentType
+   */
+  async updateDocumentType(options: UpdateDocumentTypeOptions): Promise<ValidationResult<DocumentType>> {
+    try {
+      const prompts = await this.promptsPromise;
+      const systemPrompt = buildDocumentTypePrompt(prompts);
+
+      const userPrompt = `Update this existing DocumentType based on the request below.
+
+Current DocumentType:
+\`\`\`json
+${JSON.stringify(options.current, null, 2)}
+\`\`\`
+
+Update request: ${options.updateRequest}
+
+Important:
+- Preserve the existing ID: "${options.current.id}"
+- Keep createdAt: ${options.current.createdAt}
+- Update updatedAt to: ${Date.now()}
+- Maintain structure unless specifically asked to change it
+- Follow all DocumentType schema requirements
+
+Return the complete updated DocumentType as JSON in a markdown code block.`;
+
+      const response = await this.llmProvider.complete(systemPrompt, userPrompt);
+      const json = extractJSON(response.content);
+      return validateDocumentType(json);
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error updating document type',
+      };
+    }
+  }
+
+  /**
+   * Update an existing Template
+   */
+  async updateTemplate(options: UpdateTemplateOptions): Promise<ValidationResult<Template>> {
+    try {
+      const prompts = await this.promptsPromise;
+      const systemPrompt = buildTemplatePrompt(prompts);
+
+      let userPrompt = `Update this existing Template based on the request below.
+
+Current Template:
+\`\`\`json
+${JSON.stringify(options.current, null, 2)}
+\`\`\`
+
+Update request: ${options.updateRequest}`;
+
+      if (options.documentType) {
+        userPrompt += `\n\nDocumentType schema (for reference):\n\`\`\`json\n${JSON.stringify(options.documentType, null, 2)}\n\`\`\``;
+      }
+
+      userPrompt += `
+
+Important:
+- Preserve the existing ID: "${options.current.id}"
+- Keep typeId: "${options.current.typeId}"
+- Keep createdAt: ${options.current.createdAt}
+- Update updatedAt to: ${Date.now()}
+- Maintain ALL required data-* attributes
+- Follow all template requirements
+
+Return the complete updated Template as JSON in a markdown code block.`;
+
+      const response = await this.llmProvider.complete(systemPrompt, userPrompt);
+      const json = extractJSON(response.content);
+      return validateTemplate(json);
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error updating template',
+      };
+    }
+  }
+
+  /**
+   * Update an existing Theme
+   */
+  async updateTheme(options: UpdateThemeOptions): Promise<ValidationResult<Theme>> {
+    try {
+      const prompts = await this.promptsPromise;
+      const systemPrompt = buildThemePrompt(prompts);
+
+      const userPrompt = `Update this existing Theme based on the request below.
+
+Current Theme:
+\`\`\`json
+${JSON.stringify(options.current, null, 2)}
+\`\`\`
+
+Update request: ${options.updateRequest}
+
+Important:
+- Preserve the existing ID: "${options.current.id}"
+- Keep createdAt: ${options.current.createdAt}
+- Update updatedAt to: ${Date.now()}
+- Maintain ALL required CSS variables
+- Keep print styles and proper scoping
+- Follow all theme requirements
+
+Return the complete updated Theme as JSON in a markdown code block.`;
+
+      const response = await this.llmProvider.complete(systemPrompt, userPrompt);
+      const json = extractJSON(response.content);
+      return validateTheme(json);
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error updating theme',
       };
     }
   }

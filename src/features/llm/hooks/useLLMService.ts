@@ -45,17 +45,23 @@ export interface UseLLMServiceReturn {
   configure: (settings: LLMSettings) => void;
   clearConfig: () => void;
 
-  // Document Type creation
+  // Document Type creation & update
   createDocumentType: (description: string) => Promise<ValidationResult<DocumentType>>;
+  updateDocumentType: (current: DocumentType, updateRequest: string) => Promise<ValidationResult<DocumentType>>;
   isCreatingDocumentType: boolean;
+  isUpdatingDocumentType: boolean;
 
-  // Template creation
+  // Template creation & update
   createTemplate: (typeId: string, description: string, documentType?: DocumentType) => Promise<ValidationResult<Template>>;
+  updateTemplate: (current: Template, updateRequest: string, documentType?: DocumentType) => Promise<ValidationResult<Template>>;
   isCreatingTemplate: boolean;
+  isUpdatingTemplate: boolean;
 
-  // Theme creation
+  // Theme creation & update
   createTheme: (name: string, description: string, typeId?: string) => Promise<ValidationResult<Theme>>;
+  updateTheme: (current: Theme, updateRequest: string) => Promise<ValidationResult<Theme>>;
   isCreatingTheme: boolean;
+  isUpdatingTheme: boolean;
 
   // Document editing
   editDocument: (currentData: Record<string, any>, editRequest: string) => Promise<{ success: boolean; data?: Record<string, any>; error?: string }>;
@@ -73,8 +79,11 @@ export interface UseLLMServiceReturn {
 export function useLLMService(): UseLLMServiceReturn {
   const [config, setConfig] = useState<LLMSettings | null>(() => getLLMConfig());
   const [isCreatingDocumentType, setIsCreatingDocumentType] = useState(false);
+  const [isUpdatingDocumentType, setIsUpdatingDocumentType] = useState(false);
   const [isCreatingTemplate, setIsCreatingTemplate] = useState(false);
+  const [isUpdatingTemplate, setIsUpdatingTemplate] = useState(false);
   const [isCreatingTheme, setIsCreatingTheme] = useState(false);
+  const [isUpdatingTheme, setIsUpdatingTheme] = useState(false);
   const [isEditingDocument, setIsEditingDocument] = useState(false);
   const [lastError, setLastError] = useState<string | null>(null);
 
@@ -182,6 +191,90 @@ export function useLLMService(): UseLLMServiceReturn {
     [service]
   );
 
+  const updateDocumentType = useCallback(
+    async (current: DocumentType, updateRequest: string): Promise<ValidationResult<DocumentType>> => {
+      if (!service) {
+        const error = { success: false as const, error: 'LLM service not configured' };
+        setLastError(error.error);
+        return error;
+      }
+
+      setIsUpdatingDocumentType(true);
+      setLastError(null);
+
+      try {
+        const result = await service.updateDocumentType({ current, updateRequest });
+        if (!result.success) {
+          setLastError(result.error || 'Failed to update document type');
+        }
+        return result;
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        setLastError(errorMessage);
+        return { success: false, error: errorMessage };
+      } finally {
+        setIsUpdatingDocumentType(false);
+      }
+    },
+    [service]
+  );
+
+  const updateTemplate = useCallback(
+    async (current: Template, updateRequest: string, documentType?: DocumentType): Promise<ValidationResult<Template>> => {
+      if (!service) {
+        const error = { success: false as const, error: 'LLM service not configured' };
+        setLastError(error.error);
+        return error;
+      }
+
+      setIsUpdatingTemplate(true);
+      setLastError(null);
+
+      try {
+        const result = await service.updateTemplate({ current, updateRequest, documentType });
+        if (!result.success) {
+          setLastError(result.error || 'Failed to update template');
+        }
+        return result;
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        setLastError(errorMessage);
+        return { success: false, error: errorMessage };
+      } finally {
+        setIsUpdatingTemplate(false);
+      }
+    },
+    [service]
+  );
+
+  const updateTheme = useCallback(
+    async (current: Theme, updateRequest: string): Promise<ValidationResult<Theme>> => {
+      if (!service) {
+        const error = { success: false as const, error: 'LLM service not configured' };
+        setLastError(error.error);
+        return error;
+      }
+
+      setIsUpdatingTheme(true);
+      setLastError(null);
+
+      try {
+        const result = await service.updateTheme({ current, updateRequest });
+        if (!result.success) {
+          setLastError(result.error || 'Failed to update theme');
+        }
+        return result;
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        setLastError(errorMessage);
+        return { success: false, error: errorMessage };
+      } finally {
+        setIsUpdatingTheme(false);
+      }
+    },
+    [service]
+  );
+
   const editDocument = useCallback(
     async (currentData: Record<string, any>, editRequest: string) => {
       if (!service) {
@@ -220,11 +313,17 @@ export function useLLMService(): UseLLMServiceReturn {
     configure,
     clearConfig,
     createDocumentType,
+    updateDocumentType,
     isCreatingDocumentType,
+    isUpdatingDocumentType,
     createTemplate,
+    updateTemplate,
     isCreatingTemplate,
+    isUpdatingTemplate,
     createTheme,
+    updateTheme,
     isCreatingTheme,
+    isUpdatingTheme,
     editDocument,
     isEditingDocument,
     lastError,
