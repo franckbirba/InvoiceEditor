@@ -24,7 +24,7 @@ export const InvoiceDataSchema = z.object({
   sender: z.object({
     name: z.string().min(1, 'Sender name is required'),
     address: z.string().optional(),
-    email: z.string().email().optional().or(z.literal('')),
+    email: z.union([z.literal(''), z.string().email()]).optional(),
     phone: z.string().optional(),
     bank: z.string().optional(),
     logo: z.string().optional(), // DataURL
@@ -34,7 +34,7 @@ export const InvoiceDataSchema = z.object({
   client: z.object({
     name: z.string().min(1, 'Client name is required'),
     address: z.string().optional(),
-    email: z.string().email().optional().or(z.literal('')),
+    email: z.union([z.literal(''), z.string().email()]).optional(),
     phone: z.string().optional(),
     bank: z.string().optional(),
     reg: z.string().optional(), // RCCM/IFU

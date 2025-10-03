@@ -63,6 +63,11 @@ export function ProjectSidebar({ isOpen, onToggle, onEditTemplate, onEditTheme }
     refreshData();
   }, []);
 
+  // Refresh data when activeDocumentId changes (new document created)
+  React.useEffect(() => {
+    refreshData();
+  }, [activeDocumentId]);
+
   const refreshData = () => {
     setProjects(getProjects());
     setDocuments(getDocuments());

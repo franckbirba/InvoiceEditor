@@ -28,8 +28,9 @@ export function calculateTotals(data: InvoiceData) {
     afterGlobalDiscount,
     taxAmount,
     total,
-    taxes: taxes.map(tax => ({
+    taxes: taxes.map((tax, index) => ({
       ...tax,
+      index,
       amount: afterGlobalDiscount * tax.rate / 100,
     })),
   };

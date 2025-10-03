@@ -59,7 +59,7 @@ export function ThemeSelector() {
                 >
                   <div className="font-medium">{theme.name}</div>
                   <div className="text-xs text-gray-500">
-                    {theme.typeId === 'facture' ? 'Facture' : theme.typeId === 'cv' ? 'CV' : 'Autre'}
+                    Thème CSS
                     {theme.isDefault && <span className="ml-2 text-blue-600">• Par défaut</span>}
                   </div>
                 </button>

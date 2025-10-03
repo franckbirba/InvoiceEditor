@@ -8,6 +8,7 @@ import { TemplateEditor } from './components/TemplateEditor';
 import { TemplateThemeEditor } from './components/TemplateThemeEditor';
 import { TemplateThemePreview } from './components/TemplateThemePreview';
 import { ToastProvider } from './components/Toast';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { initializeDocumentSystem } from './features/document/initialize';
 import './lib/i18n';
 
@@ -16,15 +17,13 @@ const SIDEBAR_OPEN_KEY = 'document-studio-sidebar-open';
 function App() {
   const isEditorMode = useInvoiceStore((state) => state.isEditorMode);
   const isInlineEditMode = useInvoiceStore((state) => state.isInlineEditMode);
+  const activeView = useInvoiceStore((state) => state.activeView);
+  const setActiveView = useInvoiceStore((state) => state.setActiveView);
+  const toggleViewMode = useInvoiceStore((state) => state.toggleViewMode);
   const [sidebarOpen, setSidebarOpen] = useState(() => {
     const saved = localStorage.getItem(SIDEBAR_OPEN_KEY);
     return saved ? JSON.parse(saved) : true;
   });
-  const [viewingItem, setViewingItem] = useState<{
-    type: 'template' | 'theme';
-    id: string;
-    mode: 'preview' | 'edit';
-  } | null>(null);
 
   // Initialize document system on first load
   useEffect(() => {
@@ -75,49 +74,61 @@ function App() {
 
 
   return (
-    <ToastProvider>
-      <div className="h-screen bg-gray-50 flex flex-col">
-        <Topbar />
-
-        <div className="flex-1 flex overflow-hidden min-h-0">
-          {/* Project Sidebar */}
-          <ProjectSidebar
-            isOpen={sidebarOpen}
-            onToggle={() => setSidebarOpen(!sidebarOpen)}
-            onEditTemplate={(id) => setViewingItem({ type: 'template', id, mode: 'preview' })}
-            onEditTheme={(id) => setViewingItem({ type: 'theme', id, mode: 'preview' })}
+    <ErrorBoundary>
+      <ToastProvider>
+        <div className="h-screen bg-gray-50 flex flex-col">
+          <Topbar
+            viewingItem={activeView && (activeView.type === 'template' || activeView.type === 'theme') ? activeView : null}
+            onEditItem={toggleViewMode}
           />
 
-          {/* Main Content */}
-          <main className="flex-1 overflow-y-auto p-8 min-w-0">
-            {viewingItem ? (
-              viewingItem.mode === 'preview' ? (
-                <TemplateThemePreview
-                  type={viewingItem.type}
-                  id={viewingItem.id}
-                  onClose={() => setViewingItem(null)}
-                  onEdit={() =>
-                    setViewingItem({ ...viewingItem, mode: 'edit' })
-                  }
-                />
+          <div className="flex-1 flex overflow-hidden min-h-0">
+            {/* Project Sidebar */}
+            <ProjectSidebar
+              isOpen={sidebarOpen}
+              onToggle={() => setSidebarOpen(!sidebarOpen)}
+              onEditTemplate={(id) => setActiveView({ type: 'template', id, mode: 'preview' })}
+              onEditTheme={(id) => setActiveView({ type: 'theme', id, mode: 'preview' })}
+            />
+
+            {/* Main Content */}
+            <main className="flex-1 overflow-y-auto p-8 min-w-0">
+              {activeView?.type === 'template' ? (
+                activeView.mode === 'preview' ? (
+                  <TemplateThemePreview
+                    type="template"
+                    id={activeView.id}
+                  />
+                ) : (
+                  <TemplateThemeEditor
+                    type="template"
+                    id={activeView.id}
+                  />
+                )
+              ) : activeView?.type === 'theme' ? (
+                activeView.mode === 'preview' ? (
+                  <TemplateThemePreview
+                    type="theme"
+                    id={activeView.id}
+                  />
+                ) : (
+                  <TemplateThemeEditor
+                    type="theme"
+                    id={activeView.id}
+                  />
+                )
+              ) : isEditorMode ? (
+                <TemplateEditor />
+              ) : isInlineEditMode ? (
+                <InvoicePreviewEditable />
               ) : (
-                <TemplateThemeEditor
-                  type={viewingItem.type}
-                  id={viewingItem.id}
-                  onClose={() => setViewingItem(null)}
-                />
-              )
-            ) : isEditorMode ? (
-              <TemplateEditor />
-            ) : isInlineEditMode ? (
-              <InvoicePreviewEditable />
-            ) : (
-              <InvoicePreview />
-            )}
-          </main>
+                <InvoicePreview />
+              )}
+            </main>
+          </div>
         </div>
-      </div>
-    </ToastProvider>
+      </ToastProvider>
+    </ErrorBoundary>
   );
 }
 

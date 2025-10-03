@@ -10,6 +10,11 @@ import {
 import { getTheme, getTemplate, renameTemplate, duplicateTemplate, deleteTemplate, renameTheme, duplicateTheme, deleteTheme } from '../document/document.storage';
 import sampleData from './sample-data.json';
 
+type ActiveView =
+  | { type: 'document'; id: string }
+  | { type: 'template'; id: string; mode: 'preview' | 'edit' }
+  | { type: 'theme'; id: string; mode: 'preview' | 'edit' };
+
 interface InvoiceStore {
   data: InvoiceData;
   template: string;
@@ -18,6 +23,7 @@ interface InvoiceStore {
   isInlineEditMode: boolean;
   dataVersion: number; // Incremented on external updates to trigger form reset
   activeDocumentId: string | null;
+  activeView: ActiveView | null;
 
   setData: (data: InvoiceData) => void;
   updateData: (updater: (data: InvoiceData) => InvoiceData) => void;
@@ -31,6 +37,8 @@ interface InvoiceStore {
   renameTheme: (themeId: string, newName: string) => void;
   duplicateTheme: (themeId: string) => void;
   deleteTheme: (themeId: string) => void;
+  setActiveView: (view: ActiveView | null) => void;
+  toggleViewMode: () => void; // Toggle between preview/edit for templates/themes
   toggleEditorMode: () => void;
   toggleInlineEditMode: () => void;
   resetToSample: () => void;
@@ -308,6 +316,50 @@ const defaultTemplate = `<div class="invoice-preview" id="invoice-content">
   </div>
 </div>`;
 
+// Helper function to sanitize data before Zod validation
+// Converts string numbers to actual numbers for numeric fields
+function sanitizeInvoiceData(data: any): any {
+  const sanitized = JSON.parse(JSON.stringify(data)); // Deep clone
+
+  // Sanitize items
+  if (sanitized.items && Array.isArray(sanitized.items)) {
+    sanitized.items = sanitized.items.map((item: any) => ({
+      ...item,
+      qty: typeof item.qty === 'string' ? parseFloat(item.qty) || 0 : item.qty,
+      unit_price: typeof item.unit_price === 'string' ? parseFloat(item.unit_price) || 0 : item.unit_price,
+      discount: item.discount && typeof item.discount === 'string' ? parseFloat(item.discount) || 0 : item.discount,
+    }));
+  }
+
+  // Sanitize taxes
+  if (sanitized.summary?.taxes && Array.isArray(sanitized.summary.taxes)) {
+    sanitized.summary.taxes = sanitized.summary.taxes.map((tax: any) => ({
+      ...tax,
+      rate: typeof tax.rate === 'string' ? parseFloat(tax.rate) || 0 : tax.rate,
+    }));
+  }
+
+  // Sanitize global discount
+  if (sanitized.summary?.global_discount && typeof sanitized.summary.global_discount === 'string') {
+    sanitized.summary.global_discount = parseFloat(sanitized.summary.global_discount) || 0;
+  }
+
+  // Sanitize email fields - convert invalid/whitespace-only emails to empty string
+  // Use a basic email regex to validate before passing to Zod
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (sanitized.sender?.email !== undefined) {
+    const email = String(sanitized.sender.email || '').trim();
+    sanitized.sender.email = email && emailRegex.test(email) ? email : '';
+  }
+  if (sanitized.client?.email !== undefined) {
+    const email = String(sanitized.client.email || '').trim();
+    sanitized.client.email = email && emailRegex.test(email) ? email : '';
+  }
+
+  return sanitized;
+}
+
 export const useInvoiceStore = create<InvoiceStore>((set, get) => {
   // Load initial data - try active document first
   let activeId = getActiveDocumentId();
@@ -318,13 +370,19 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => {
   if (activeId) {
     const doc = loadDocument(activeId);
     if (doc) {
-      initialData = InvoiceDataSchema.parse(doc.data);
-      initialTemplate = doc.template || defaultTemplate;
-      // Load theme from document, fallback to default invoice theme
-      initialTheme = doc.theme || (() => {
-        const invoiceTheme = getTheme('theme-invoice-default');
-        return invoiceTheme?.content || defaultInvoiceTheme;
-      })();
+      try {
+        initialData = InvoiceDataSchema.parse(sanitizeInvoiceData(doc.data));
+        initialTemplate = doc.template || defaultTemplate;
+        // Load theme from document, fallback to default invoice theme
+        initialTheme = doc.theme || (() => {
+          const invoiceTheme = getTheme('theme-invoice-default');
+          return invoiceTheme?.content || defaultInvoiceTheme;
+        })();
+      } catch (error) {
+        console.error('Failed to parse document data, using sample data:', error);
+        // If validation fails, use sample data
+        initialData = InvoiceDataSchema.parse(sampleData);
+      }
     } else {
       // Document not found, create new one
       activeId = createNewDocument();
@@ -362,6 +420,53 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => {
     isInlineEditMode: false,
     dataVersion: 0,
     activeDocumentId: activeId,
+    activeView: activeId ? { type: 'document', id: activeId } : null,
+
+    setActiveView: (view) => {
+      // If switching to a document, load it
+      if (view?.type === 'document') {
+        const doc = loadDocument(view.id);
+        if (doc) {
+          try {
+            const data = InvoiceDataSchema.parse(sanitizeInvoiceData(doc.data));
+            const themeContent = doc.theme || (() => {
+              const invoiceTheme = getTheme('theme-invoice-default');
+              return invoiceTheme?.content || defaultInvoiceTheme;
+            })();
+
+            set({
+              activeView: view,
+              data,
+              template: doc.template || defaultTemplate,
+              theme: themeContent,
+              activeDocumentId: view.id,
+              dataVersion: get().dataVersion + 1,
+              isEditorMode: false,
+              isInlineEditMode: false,
+            });
+          } catch (error) {
+            console.error('Failed to load document, data validation error:', error);
+            // Don't crash, just log the error
+            alert('Erreur lors du chargement du document. Les données sont peut-être corrompues.');
+          }
+        }
+      } else {
+        // For templates and themes, just set the view
+        set({ activeView: view });
+      }
+    },
+
+    toggleViewMode: () => {
+      const currentView = get().activeView;
+      if (currentView && (currentView.type === 'template' || currentView.type === 'theme')) {
+        set({
+          activeView: {
+            ...currentView,
+            mode: currentView.mode === 'preview' ? 'edit' : 'preview'
+          }
+        });
+      }
+    },
 
     setData: (data) => {
       set({ data });
@@ -388,8 +493,27 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => {
     setTemplateById: (templateId) => {
       const template = getTemplate(templateId);
       if (template) {
-        set({ template: template.content });
-        saveCurrentDocument();
+        const state = get();
+        set({
+          template: template.content,
+          dataVersion: state.dataVersion + 1
+        });
+
+        // Save the document with the new template
+        if (state.activeDocumentId) {
+          saveDocument(
+            state.activeDocumentId,
+            state.data,
+            template.content,
+            state.theme,
+            {
+              name: `Facture ${state.data.invoice.number}`,
+              createdAt: Date.now(),
+              invoiceNumber: state.data.invoice.number,
+              clientName: state.data.client.name,
+            }
+          );
+        }
       }
     },
 
@@ -464,6 +588,7 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => {
       );
 
       set({
+        activeView: { type: 'document', id: newId },
         data: duplicatedData,
         template: currentTemplate,
         theme: currentTheme,
@@ -478,23 +603,36 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => {
 
         // Check if it's export format with template
         if (parsed.data && parsed.template) {
-          const data = InvoiceDataSchema.parse(parsed.data);
-          set({
-            data,
-            template: parsed.template || get().template,
-            theme: parsed.theme || get().theme,
-            dataVersion: get().dataVersion + 1
-          });
-          saveCurrentDocument();
+          try {
+            const data = InvoiceDataSchema.parse(sanitizeInvoiceData(parsed.data));
+            set({
+              data,
+              template: parsed.template || get().template,
+              theme: parsed.theme || get().theme,
+              dataVersion: get().dataVersion + 1
+            });
+            saveCurrentDocument();
+          } catch (validationError) {
+            console.error('Data validation error:', validationError);
+            throw new Error('Format de données invalide. Vérifiez que toutes les données sont correctes.');
+          }
         } else {
           // Direct data import
-          const data = InvoiceDataSchema.parse(parsed);
-          set({ data, dataVersion: get().dataVersion + 1 });
-          saveCurrentDocument();
+          try {
+            const data = InvoiceDataSchema.parse(sanitizeInvoiceData(parsed));
+            set({ data, dataVersion: get().dataVersion + 1 });
+            saveCurrentDocument();
+          } catch (validationError) {
+            console.error('Data validation error:', validationError);
+            throw new Error('Format de données invalide. Vérifiez que toutes les données sont correctes.');
+          }
         }
       } catch (error) {
         console.error('Failed to parse JSON:', error);
-        throw new Error('Invalid JSON format');
+        if (error instanceof Error && error.message.includes('Format de données invalide')) {
+          throw error;
+        }
+        throw new Error('Format JSON invalide');
       }
     },
 
@@ -510,36 +648,22 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => {
     },
 
     loadDocumentById: (id: string) => {
-      const doc = loadDocument(id);
-      if (doc) {
-        const data = InvoiceDataSchema.parse(doc.data);
-        // Load theme from document, fallback to default invoice theme
-        const themeContent = doc.theme || (() => {
-          const invoiceTheme = getTheme('theme-invoice-default');
-          return invoiceTheme?.content || defaultInvoiceTheme;
-        })();
-        
-        set({
-          data,
-          template: doc.template || defaultTemplate,
-          theme: themeContent,
-          activeDocumentId: id,
-          dataVersion: get().dataVersion + 1,
-        });
-      }
+      get().setActiveView({ type: 'document', id });
     },
 
     createDocument: () => {
       const newId = createNewDocument();
       const newData = InvoiceDataSchema.parse(sampleData);
-      const invoiceTheme = getTheme('theme-invoice-default');
-      const themeContent = invoiceTheme?.content || defaultInvoiceTheme;
+
+      // Use the currently selected template and theme from the store
+      const currentTemplate = get().template;
+      const currentTheme = get().theme;
 
       saveDocument(
         newId,
         newData,
-        defaultTemplate,
-        themeContent,
+        currentTemplate,
+        currentTheme,
         {
           name: `Facture ${newData.invoice.number}`,
           createdAt: Date.now(),
@@ -548,13 +672,7 @@ export const useInvoiceStore = create<InvoiceStore>((set, get) => {
         }
       );
 
-      set({
-        data: newData,
-        template: defaultTemplate,
-        theme: themeContent,
-        activeDocumentId: newId,
-        dataVersion: get().dataVersion + 1,
-      });
+      get().setActiveView({ type: 'document', id: newId });
     },
   };
 });

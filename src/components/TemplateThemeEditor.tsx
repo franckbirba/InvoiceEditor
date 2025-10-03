@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { X, Save, FileCode, Palette } from 'lucide-react';
+import { Save, FileCode, Palette } from 'lucide-react';
 import { getTemplate, getTheme, saveTemplate, saveTheme } from '../features/document/document.storage';
 import type { Template, Theme } from '../features/document/document.schema';
 import { useToast } from './Toast';
@@ -14,10 +14,9 @@ const Editor = React.lazy(() =>
 interface TemplateThemeEditorProps {
   type: 'template' | 'theme';
   id: string;
-  onClose: () => void;
 }
 
-export function TemplateThemeEditor({ type, id, onClose }: TemplateThemeEditorProps) {
+export function TemplateThemeEditor({ type, id }: TemplateThemeEditorProps) {
   const { showToast } = useToast();
   const [item, setItem] = React.useState<Template | Theme | null>(null);
   const [content, setContent] = React.useState('');
@@ -54,16 +53,6 @@ export function TemplateThemeEditor({ type, id, onClose }: TemplateThemeEditorPr
     }
 
     setHasChanges(false);
-  };
-
-  const handleClose = () => {
-    if (hasChanges) {
-      if (window.confirm('Vous avez des modifications non sauvegardées. Voulez-vous vraiment fermer ?')) {
-        onClose();
-      }
-    } else {
-      onClose();
-    }
   };
 
   if (!item) {
@@ -104,13 +93,6 @@ export function TemplateThemeEditor({ type, id, onClose }: TemplateThemeEditorPr
           >
             <Save className="w-4 h-4" />
             Sauvegarder
-          </button>
-          <button
-            onClick={handleClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-            title="Fermer"
-          >
-            <X className="w-5 h-5" />
           </button>
         </div>
       </div>

@@ -28,17 +28,27 @@ export function enrichInvoiceData(data: InvoiceData): TemplateData {
   const locale = data.locale === 'fr' ? 'fr-FR' : 'en-US';
   const currency = data.invoice.currency;
 
-  const items_with_totals = data.items.map((item) => ({
+  const items_with_totals = data.items.map((item, index) => ({
     ...item,
+    index,
     line_total: calculateLineTotal(item),
     line_total_formatted: formatCurrency(calculateLineTotal(item), currency, locale),
     unit_price_formatted: formatCurrency(item.unit_price, currency, locale),
     qty_formatted: formatNumber(item.qty, locale),
   }));
 
+  // Format tax amounts
+  const formattedTaxes = totals.taxes.map(tax => ({
+    ...tax,
+    amount: formatCurrency(tax.amount, currency, locale),
+  }));
+
   return {
     ...data,
-    totals,
+    totals: {
+      ...totals,
+      taxes: formattedTaxes,
+    },
     items_with_totals,
     formatted: {
       subtotal: formatCurrency(totals.subtotal, currency, locale),

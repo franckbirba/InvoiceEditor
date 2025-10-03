@@ -4,7 +4,6 @@ import type { Theme } from '../document.schema';
 export const blackWhiteTheme: Theme = {
   id: 'theme-invoice-blackwhite',
   name: 'Noir & Blanc Sobre',
-  typeId: 'facture',
   isDefault: false,
   createdAt: Date.now(),
   updatedAt: Date.now(),
@@ -173,7 +172,6 @@ export const blackWhiteTheme: Theme = {
 export const googleTheme: Theme = {
   id: 'theme-invoice-google',
   name: 'Coloré Google',
-  typeId: 'facture',
   isDefault: false,
   createdAt: Date.now(),
   updatedAt: Date.now(),
@@ -359,7 +357,6 @@ export const googleTheme: Theme = {
 export const googleDocsTheme: Theme = {
   id: 'theme-invoice-gdocs',
   name: 'Style Google Docs',
-  typeId: 'facture',
   isDefault: false,
   createdAt: Date.now(),
   updatedAt: Date.now(),
